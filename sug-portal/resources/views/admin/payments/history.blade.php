@@ -1,0 +1,63 @@
+@extends('admin.layout')
+
+@section('content')
+<div class="container mx-auto px-6 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Payment History</h1>
+        <a href="{{ route('admin.dashboard') }}" class="text-blue-600 hover:underline">Back to Dashboard</a>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+        <form action="{{ route('admin.payments.history') }}" method="GET" class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1">
+                <input type="text" name="email" value="{{ request('email') }}" placeholder="Search student by email..." class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
+                Search
+            </button>
+            <a href="{{ route('admin.payments.history') }}" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-bold hover:bg-gray-300 transition text-center">
+                Reset
+            </a>
+        </form>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-100">
+                <tr class="text-gray-700">
+                    <th class="p-4 font-bold border-b">Receipt No</th>
+                    <th class="p-4 font-bold border-b">Student</th>
+                    <th class="p-4 font-bold border-b">Amount</th>
+                    <th class="p-4 font-bold border-b">Status</th>
+                    <th class="p-4 font-bold border-b">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($payments as $payment)
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-4 font-mono text-sm">{{ $payment->receipt->receipt_no ?? 'N/A' }}</td>
+                        <td class="p-4">
+                            <div class="font-medium">{{ $payment->student->user->name ?? 'Unknown' }}</div>
+                            <div class="text-xs text-gray-500">{{ $payment->student->user->email ?? 'N/A' }}</div>
+                        </td>
+                        <td class="p-4 font-bold">₦{{ number_format($payment->amount, 2) }}</td>
+                        <td class="p-4">
+                            <span class="px-2 py-1 rounded-full text-xs font-bold {{ $payment->status === 'success' ? 'bg-green-100 text-green-700' : ($payment->status === 'initiated' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
+                                {{ ucfirst($payment->status) }}
+                            </span>
+                        </td>
+                        <td class="p-4 text-sm text-gray-500">{{ $payment->created_at->format('M d, Y H:i') }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="p-8 text-center text-gray-500">No payments found.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+        <div class="p-4 border-t">
+            {{ $payments->links() }}
+        </div>
+    </div>
+</div>
+@endsection
