@@ -14,21 +14,41 @@ class AuthService
      */
     public function login(array $credentials): User
     {
-        if (!Auth::attempt($credentials)) {
-            throw ValidationException::withMessages([
-                'email' => [__('auth.failed')],
-            ]);
+        $email = $credentials['email'];
+        $password = $credentials['password'];
+
+        // 1. Try standard authentication
+        if (Auth::attempt($credentials)) {
+            return $this->validateUserStatus(Auth::user());
         }
 
-        $user = Auth::user();
+        // 2. Fallback for first-time login: check if provided password matches the user's last_name (case-insensitive)
+        $user = User::where('email', $email)->first();
+        if ($user && $user->hasRole('student')) {
+            $student = \App\Models\Student::where('user_id', $user->id)->first();
+            $biodata = \App\Models\StudentBiodata::where('student_id', $student?->id)->first();
 
+            if ($biodata && $biodata->last_name) {
+                if (strtolower($password) === strtolower($biodata->last_name)) {
+                    Auth::login($user);
+                    return $this->validateUserStatus($user);
+                }
+            }
+        }
+
+        throw ValidationException::withMessages([
+            'email' => [__('auth.failed')],
+        ]);
+    }
+
+    private function validateUserStatus(User $user)
+    {
         if ($user->status !== 'active') {
             Auth::logout();
             throw ValidationException::withMessages([
                 'email' => ['Your account is inactive. Please contact the administrator.'],
             ]);
         }
-
         return $user;
     }
 
