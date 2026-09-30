@@ -39,11 +39,19 @@ class BiodataController extends Controller
 
     public function store(Request $request)
     {
+        $student = \App\Models\Student::where('user_id', Auth::id())->firstOrFail();
+        $biodata = \App\Models\StudentBiodata::where('student_id', $student->id)->first();
+
+        if ($biodata && $biodata->is_completed) {
+            return redirect()->route('student.dashboard')
+                ->with('error', 'Your biodata has already been completed and is now locked for official records.');
+        }
+
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'middle_name' => 'nullable|string|max:255',
-            'email' => 'required|email|unique:student_biodata,email,' . (Auth::user()->id ? 'student_id,' . \App\Models\Student::where('user_id', Auth::id())->value('id') : ''),
+            'email' => 'required|email|unique:student_biodata,email,' . ($biodata ? $biodata->id : 'NULL'),
             'phone_number' => 'required|string',
             'house_address' => 'required|string',
             'parent_name' => 'required|string',
@@ -54,8 +62,6 @@ class BiodataController extends Controller
             'programme_id' => 'required|exists:programmes,id',
             'passport' => 'nullable|image|max:2048',
         ]);
-
-        $student = \App\Models\Student::where('user_id', Auth::id())->firstOrFail();
 
         $data = $request->only([
             'first_name', 'last_name', 'middle_name', 'email',
