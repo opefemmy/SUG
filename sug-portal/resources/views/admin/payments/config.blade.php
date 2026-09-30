@@ -14,32 +14,32 @@
     @endif
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <form action="{{ route('admin.payments.config.update') }}" method="POST">
+        <form action="{{ route('admin.payments.config.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="p-6 space-y-8">
 
-                <!-- Active Gateway Selection -->
+                <!-- Enabled Gateways Selection -->
                 <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                    <label class="block text-sm font-bold text-blue-800 mb-3">Active Payment Gateway</label>
-                    <div class="flex gap-6">
+                    <label class="block text-sm font-bold text-blue-800 mb-3">Enabled Payment Gateways</label>
+                    <div class="flex flex-wrap gap-6">
                         <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="payments[active_gateway]" value="paystack" {{ $config['active_gateway'] == 'paystack' ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
+                            <input type="checkbox" name="payments[enabled_gateways][]" value="paystack" {{ in_array('paystack', explode(',', $config['enabled_gateways'] ?? '')) ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
                             <span class="text-gray-700 font-medium">Paystack</span>
                         </label>
                         <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="payments[active_gateway]" value="flutterwave" {{ $config['active_gateway'] == 'flutterwave' ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
+                            <input type="checkbox" name="payments[enabled_gateways][]" value="flutterwave" {{ in_array('flutterwave', explode(',', $config['enabled_gateways'] ?? '')) ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
                             <span class="text-gray-700 font-medium">Flutterwave</span>
                         </label>
                         <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="payments[active_gateway]" value="remita" {{ $config['active_gateway'] == 'remita' ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
+                            <input type="checkbox" name="payments[enabled_gateways][]" value="remita" {{ in_array('remita', explode(',', $config['enabled_gateways'] ?? '')) ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
                             <span class="text-gray-700 font-medium">Remita</span>
                         </label>
                         <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="payments[active_gateway]" value="opay" {{ $config['active_gateway'] == 'opay' ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
+                            <input type="checkbox" name="payments[enabled_gateways][]" value="opay" {{ in_array('opay', explode(',', $config['enabled_gateways'] ?? '')) ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
                             <span class="text-gray-700 font-medium">OPay</span>
                         </label>
                         <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="radio" name="payments[active_gateway]" value="quickteller" {{ $config['active_gateway'] == 'quickteller' ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
+                            <input type="checkbox" name="payments[enabled_gateways][]" value="quickteller" {{ in_array('quickteller', explode(',', $config['enabled_gateways'] ?? '')) ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
                             <span class="text-gray-700 font-medium">Quickteller</span>
                         </label>
                     </div>
@@ -52,6 +52,19 @@
                             <span class="w-2 h-6 bg-blue-600 rounded mr-2"></span> Paystack
                         </h3>
                         <div class="space-y-4">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-16 h-16 rounded-lg border bg-gray-100 overflow-hidden flex items-center justify-center">
+                                    @if($config['paystack_logo'])
+                                        <img src="{{ asset('storage/' . $config['paystack_logo']) }}" class="w-full h-full object-cover">
+                                    @else
+                                        <span class="text-gray-400 text-xs">No Logo</span>
+                                    @endif
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Gateway Logo</label>
+                                    <input type="file" name="payments[paystack_logo]" class="text-xs w-full">
+                                </div>
+                            </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Public Key</label>
                                 <input type="text" name="payments[paystack_public_key]" value="{{ $config['paystack_public_key'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
@@ -69,6 +82,19 @@
                             <span class="w-2 h-6 bg-orange-500 rounded mr-2"></span> Flutterwave
                         </h3>
                         <div class="space-y-4">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-16 h-16 rounded-lg border bg-gray-100 overflow-hidden flex items-center justify-center">
+                                    @if($config['flutterwave_logo'])
+                                        <img src="{{ asset('storage/' . $config['flutterwave_logo']) }}" class="w-full h-full object-cover">
+                                    @else
+                                        <span class="text-gray-400 text-xs">No Logo</span>
+                                    @endif
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Gateway Logo</label>
+                                    <input type="file" name="payments[flutterwave_logo]" class="text-xs w-full">
+                                </div>
+                            </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Public Key</label>
                                 <input type="text" name="payments[flutterwave_public_key]" value="{{ $config['flutterwave_public_key'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
@@ -86,6 +112,19 @@
                             <span class="w-2 h-6 bg-green-600 rounded mr-2"></span> Remita
                         </h3>
                         <div class="space-y-4">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-16 h-16 rounded-lg border bg-gray-100 overflow-hidden flex items-center justify-center">
+                                    @if($config['remita_logo'])
+                                        <img src="{{ asset('storage/' . $config['remita_logo']) }}" class="w-full h-full object-cover">
+                                    @else
+                                        <span class="text-gray-400 text-xs">No Logo</span>
+                                    @endif
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Gateway Logo</label>
+                                    <input type="file" name="payments[remita_logo]" class="text-xs w-full">
+                                </div>
+                            </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Merchant ID</label>
                                 <input type="text" name="payments[remita_merchant_id]" value="{{ $config['remita_merchant_id'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
@@ -103,6 +142,19 @@
                             <span class="w-2 h-6 bg-green-500 rounded mr-2"></span> OPay
                         </h3>
                         <div class="space-y-4">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-16 h-16 rounded-lg border bg-gray-100 overflow-hidden flex items-center justify-center">
+                                    @if($config['opay_logo'])
+                                        <img src="{{ asset('storage/' . $config['opay_logo']) }}" class="w-full h-full object-cover">
+                                    @else
+                                        <span class="text-gray-400 text-xs">No Logo</span>
+                                    @endif
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Gateway Logo</label>
+                                    <input type="file" name="payments[opay_logo]" class="text-xs w-full">
+                                </div>
+                            </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Merchant ID</label>
                                 <input type="text" name="payments[opay_merchant_id]" value="{{ $config['opay_merchant_id'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
@@ -138,6 +190,19 @@
                             <span class="w-2 h-6 bg-red-600 rounded mr-2"></span> Quickteller
                         </h3>
                         <div class="space-y-4">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-16 h-16 rounded-lg border bg-gray-100 overflow-hidden flex items-center justify-center">
+                                    @if($config['quickteller_logo'])
+                                        <img src="{{ asset('storage/' . $config['quickteller_logo']) }}" class="w-full h-full object-cover">
+                                    @else
+                                        <span class="text-gray-400 text-xs">No Logo</span>
+                                    @endif
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Gateway Logo</label>
+                                    <input type="file" name="payments[quickteller_logo]" class="text-xs w-full">
+                                </div>
+                            </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Merchant ID</label>
                                 <input type="text" name="payments[quickteller_merchant_id]" value="{{ $config['quickteller_merchant_id'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">

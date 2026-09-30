@@ -21,22 +21,27 @@ class PaymentConfigController extends Controller
 
         // Define the required keys for each gateway to ensure they appear in the form
         $defaultKeys = [
-            'active_gateway' => 'paystack',
+            'enabled_gateways' => 'paystack',
             'paystack_public_key' => '',
             'paystack_secret_key' => '',
+            'paystack_logo' => '',
             'flutterwave_public_key' => '',
             'flutterwave_secret_key' => '',
+            'flutterwave_logo' => '',
             'remita_merchant_id' => '',
             'remita_api_key' => '',
+            'remita_logo' => '',
             'opay_merchant_id' => '',
             'opay_public_key' => '',
             'opay_secret_key' => '',
             'opay_base_url' => 'https://testapi.opaycheckout.com/api/v1/international',
             'opay_pay_method' => '',
+            'opay_logo' => '',
             'quickteller_merchant_id' => '',
             'quickteller_api_key' => '',
             'quickteller_api_secret' => '',
             'quickteller_base_url' => 'https://stg-api.quickteller.com/api/v1',
+            'quickteller_logo' => '',
         ];
 
         $config = array_merge($defaultKeys, $config);
@@ -47,26 +52,41 @@ class PaymentConfigController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'payments.active_gateway' => 'required|in:paystack,flutterwave,remita,opay,quickteller',
+            'payments.enabled_gateways' => 'required|array',
             'payments.paystack_public_key' => 'nullable|string',
             'payments.paystack_secret_key' => 'nullable|string',
+            'payments.paystack_logo' => 'nullable|image|max:2048',
             'payments.flutterwave_public_key' => 'nullable|string',
             'payments.flutterwave_secret_key' => 'nullable|string',
+            'payments.flutterwave_logo' => 'nullable|image|max:2048',
             'payments.remita_merchant_id' => 'nullable|string',
             'payments.remita_api_key' => 'nullable|string',
+            'payments.remita_logo' => 'nullable|image|max:2048',
             'payments.opay_merchant_id' => 'nullable|string',
             'payments.opay_public_key' => 'nullable|string',
             'payments.opay_secret_key' => 'nullable|string',
             'payments.opay_base_url' => 'nullable|string',
             'payments.opay_pay_method' => 'nullable|string',
+            'payments.opay_logo' => 'nullable|image|max:2048',
             'payments.quickteller_merchant_id' => 'nullable|string',
             'payments.quickteller_api_key' => 'nullable|string',
             'payments.quickteller_api_secret' => 'nullable|string',
             'payments.quickteller_base_url' => 'nullable|string',
+            'payments.quickteller_logo' => 'nullable|image|max:2048',
         ]);
 
         foreach ($request->payments as $key => $value) {
-            $this->settingsService->set($key, $value, 'payments');
+            $saveValue = $value;
+
+            if ($key === 'enabled_gateways' && is_array($value)) {
+                $saveValue = implode(',', $value);
+            } elseif ($request->hasFile("payments.{$key}")) {
+                $file = $request->file("payments.{$key}");
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $saveValue = $file->storeAs('branding/payments', $filename, 'public');
+            }
+
+            $this->settingsService->set($key, $saveValue, 'payments');
         }
 
         return redirect()->back()->with('success', 'Payment configuration updated successfully.');

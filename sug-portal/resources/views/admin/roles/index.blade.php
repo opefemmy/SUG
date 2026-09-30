@@ -3,7 +3,7 @@
 @section('content')
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-800">Role Management</h1>
-        <a href="{{ route('roles.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+        <a href="{{ route('admin.roles.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
             + Create Role
         </a>
     </div>
@@ -37,8 +37,8 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 text-right space-x-2">
-                            <a href="{{ route('roles.edit', $role->id) }}" class="text-blue-600 hover:text-blue-800 font-medium text-sm">Edit</a>
-                            <form action="{{ route('roles.destroy', $role->id) }}" method="POST" class="inline">
+                            <a href="{{ route('admin.roles.edit', $role->id) }}" class="text-blue-600 hover:text-blue-800 font-medium text-sm">Edit</a>
+                            <form action="{{ route('admin.roles.destroy', $role->id) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:text-red-800 font-medium text-sm" onclick="return confirm('Are you sure?')">Delete</button>

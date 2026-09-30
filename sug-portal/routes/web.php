@@ -152,15 +152,26 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Academic Routes
     Route::prefix('academic')->name('academic.')->group(function () {
         Route::resource('schools', SchoolController::class);
+        Route::get('schools/template', [SchoolController::class, 'downloadTemplate'])->name('schools.template');
+        Route::post('schools/import', [SchoolController::class, 'import'])->name('schools.import');
         Route::resource('departments', DepartmentController::class);
         Route::resource('programmes', ProgrammeController::class);
+        Route::get('programmes/template', [ProgrammeController::class, 'downloadTemplate'])->name('programmes.template');
+        Route::post('programmes/import', [ProgrammeController::class, 'import'])->name('programmes.import');
         Route::resource('sessions', \App\Http\Controllers\Admin\AcademicSessionController::class);
         Route::resource('levels', \App\Http\Controllers\Admin\AcademicLevelController::class);
     });
 
     // Other Admin Resources
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
-    Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);
+    Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class)->names([
+        'index' => 'roles.index',
+        'create' => 'roles.create',
+        'store' => 'roles.store',
+        'edit' => 'roles.edit',
+        'update' => 'roles.update',
+        'destroy' => 'roles.destroy',
+    ]);
     Route::get('fees', [\App\Http\Controllers\Admin\FeeController::class, 'index'])->name('fees.index');
     Route::get('fees/create', [\App\Http\Controllers\Admin\FeeController::class, 'create'])->name('fees.create');
     Route::post('fees', [\App\Http\Controllers\Admin\FeeController::class, 'store'])->name('fees.store');
@@ -168,9 +179,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('fees/{fee}', [\App\Http\Controllers\Admin\FeeController::class, 'update'])->name('fees.update');
     Route::delete('fees/{fee}', [\App\Http\Controllers\Admin\FeeController::class, 'destroy'])->name('fees.destroy');
     Route::get('debtors', [\App\Http\Controllers\Admin\DebtorController::class, 'index'])->name('debtors.index');
-    Route::resource('payments-config', \App\Http\Controllers\Admin\PaymentConfigController::class)->names([
-        'index' => 'payments.config.index'
-    ]);
+    Route::get('payments-config', [\App\Http\Controllers\Admin\PaymentConfigController::class, 'index'])->name('payments.config.index');
+    Route::post('payments-config', [\App\Http\Controllers\Admin\PaymentConfigController::class, 'update'])->name('payments.config.update');
     Route::get('payments-history', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'index'])->name('payments.history');
 
     // Election Management

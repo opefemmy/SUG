@@ -3,7 +3,7 @@
 @section('content')
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold text-gray-800">User Management</h1>
-        <a href="{{ route('users.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+        <a href="{{ route('admin.users.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
             + Add User
         </a>
     </div>
@@ -16,7 +16,7 @@
 
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="p-4 border-b border-gray-200 bg-gray-50">
-            <form action="{{ route('users.index') }}" method="GET" class="flex gap-4">
+            <form action="{{ route('admin.users.index') }}" method="GET" class="flex gap-4">
                 <div class="relative flex-1">
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -26,7 +26,7 @@
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name or email..." class="pl-10 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
                 <button type="submit" class="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition">Search</button>
-                <a href="{{ route('users.index') }}" class="px-4 py-2 text-gray-600 hover:text-gray-800">Reset</a>
+                <a href="{{ route('admin.users.index') }}" class="px-4 py-2 text-gray-600 hover:text-gray-800">Reset</a>
             </form>
         </div>
 
@@ -57,8 +57,8 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right space-x-2">
-                            <a href="{{ route('users.edit', $user->id) }}" class="text-blue-600 hover:text-blue-800 font-medium text-sm">Edit</a>
-                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" class="inline">
+                            <a href="{{ route('admin.users.edit', $user->id) }}" class="text-blue-600 hover:text-blue-800 font-medium text-sm">Edit</a>
+                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:text-red-800 font-medium text-sm" onclick="return confirm('Are you sure?')">Delete</button>

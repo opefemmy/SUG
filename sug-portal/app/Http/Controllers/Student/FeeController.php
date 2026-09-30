@@ -74,14 +74,13 @@ class FeeController extends Controller
     }
 
     /**
-     * Redirect student to the configured payment gateway.
+     * Show the gateway selection page.
      */
-    public function pay()
+    public function pay(Request $request)
     {
         $student = Student::where('user_id', Auth::id())->firstOrFail();
 
         // Determine which fee the student is paying.
-        // IMPORTANT: Only pick a fee that hasn't been paid successfully yet.
         $fee = FeeStructure::where('session_id', $student->session_id)
             ->where(function($query) use ($student) {
                 $query->where('level_id', $student->current_level_id)
@@ -101,18 +100,56 @@ class FeeController extends Controller
                 ->with('error', 'No outstanding fees found for your profile.');
         }
 
-        try {
-            // Get the active gateway from settings
-            $gatewayName = $this->settingsService->get('payments.active_gateway', 'opay');
+        // Get enabled gateways from settings
+        $enabledGatewaysString = $this->settingsService->get('payments.enabled_gateways', 'paystack');
+        $enabledGateways = explode(',', $enabledGatewaysString);
 
+        // Fetch logos for enabled gateways
+        $gatewayLogos = [];
+        foreach ($enabledGateways as $gateway) {
+            $gatewayLogos[$gateway] = $this->settingsService->get("payments.{$gateway}_logo");
+        }
+
+        return view('student.fees.select_gateway', [
+            'enabledGateways' => $enabledGateways,
+            'gatewayLogos' => $gatewayLogos,
+            'fee' => $fee,
+            'student' => $student
+        ]);
+    }
+
+    /**
+     * Process the selected gateway and initiate payment.
+     */
+    public function processPayment(Request $request)
+    {
+        $request->validate([
+            'gateway' => 'required|string',
+            'fee_id' => 'required|exists:fee_structures,id'
+        ]);
+
+        $student = Student::where('user_id', Auth::id())->firstOrFail();
+        $fee = FeeStructure::findOrFail($request->fee_id);
+        $selectedGateway = $request->gateway;
+
+        // Validate that the selected gateway is enabled
+        $enabledGatewaysString = $this->settingsService->get('payments.enabled_gateways', 'paystack');
+        $enabledGateways = explode(',', $enabledGatewaysString);
+
+        if (!in_array($selectedGateway, $enabledGateways)) {
+            return redirect()->route('student.fees.pay')
+                ->with('error', 'The selected payment gateway is currently unavailable.');
+        }
+
+        try {
             // Initialize payment via the PaymentService
-            $result = $this->paymentService->initiatePayment($student, $fee, $gatewayName);
+            $result = $this->paymentService->initiatePayment($student, $fee, $selectedGateway);
 
             // Redirect student to the gateway's payment URL
             return redirect()->away($result['gateway_data']['payment_url']);
 
         } catch (\Exception $e) {
-            return redirect()->route('student.dashboard')
+            return redirect()->route('student.fees.pay')
                 ->with('error', 'Payment failed to initialize: ' . $e->getMessage());
         }
     }

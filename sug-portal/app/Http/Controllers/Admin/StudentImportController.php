@@ -29,8 +29,26 @@ class StudentImportController extends Controller
         $file = $request->file('csv_file');
         $handle = fopen($file->getRealPath(), 'r');
 
-        // Get header
+        // Get header and remove BOM if present
         $header = fgetcsv($handle);
+        if (!$header) {
+            fclose($handle);
+            return back()->with('error', 'The uploaded CSV file is empty.');
+        }
+
+        // Clean headers: remove BOM and trim whitespace
+        $header = array_map(function($h) {
+            return trim(preg_replace('/^\xEF\xBB\xBF/', '', $h));
+        }, $header);
+
+        // Validate required headers exist
+        $required = ['matric_no', 'surname', 'name', 'department', 'level'];
+        foreach ($required as $req) {
+            if (!in_array($req, $header)) {
+                fclose($handle);
+                return back()->with('error', "Missing required CSV column: {$req}");
+            }
+        }
 
         $rows = [];
         while (($data = fgetcsv($handle)) !== false) {
@@ -39,6 +57,10 @@ class StudentImportController extends Controller
             }
         }
         fclose($handle);
+
+        if (empty($rows)) {
+            return back()->with('error', 'No valid data found in the CSV file.');
+        }
 
         $results = $this->importService->importStudents($rows);
 
