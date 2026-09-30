@@ -65,7 +65,7 @@ class StudentImportService
                         ? (int)$matricParts[1]
                         : now()->year;
 
-                    Student::updateOrCreate(
+                    $student = Student::updateOrCreate(
                         ['user_id' => $user->id],
                         [
                             'matric_no' => $username,
@@ -75,6 +75,17 @@ class StudentImportService
                             'session_id' => $currentSession ? $currentSession->id : null,
                             'current_level_id' => $level->id,
                             'admission_year' => $admissionYear,
+                        ]
+                    );
+
+                    // 4. Create basic Biodata from CSV
+                    \App\Models\StudentBiodata::updateOrCreate(
+                        ['student_id' => $student->id],
+                        [
+                            'first_name' => $row['name'],
+                            'last_name' => $row['surname'],
+                            'email' => $username, // Fallback to matric_no as email
+                            'is_completed' => false,
                         ]
                     );
                 });
