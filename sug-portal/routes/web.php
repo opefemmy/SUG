@@ -101,8 +101,8 @@ Route::prefix('student')->name('student.')->group(function () {
     // Biodata Routes
     Route::get('/biodata', [StudentBiodataController::class, 'index'])->name('biodata.index');
     Route::post('/biodata', [StudentBiodataController::class, 'store'])->name('biodata.store');
-    Route::get('/biodata/departments/{school_id}', [StudentBiodataController::class, 'getDepartments']);
-    Route::get('/biodata/programmes/{department_id}', [StudentBiodataController::class, 'getProgrammes']);
+    Route::get('/biodata/departments', [StudentBiodataController::class, 'getDepartments']);
+    Route::get('/biodata/programmes', [StudentBiodataController::class, 'getProgrammes']);
     Route::get('/biodata/change-password', [StudentBiodataController::class, 'changePassword'])->name('auth.change_password');
     Route::post('/biodata/update-password', [StudentBiodataController::class, 'updatePassword'])->name('auth.update_password');
 
