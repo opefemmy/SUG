@@ -35,4 +35,9 @@ class FeeStructure extends Model
     {
         return $this->belongsTo(AcademicSession::class);
     }
+
+    public function payments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
 }
