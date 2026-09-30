@@ -86,6 +86,9 @@ class PaymentConfigController extends Controller
                 $saveValue = $file->storeAs('branding/payments', $filename, 'public');
             }
 
+            // Save with the key as is, but in the 'payments' group.
+            // If we want it to be accessible as 'payments.enabled_gateways',
+            // we should be consistent about whether the dot is in the key itself or handled by the service.
             $this->settingsService->set($key, $saveValue, 'payments');
         }
 

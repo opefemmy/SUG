@@ -16,6 +16,8 @@ class StudentBiodata extends Model
         'middle_name',
         'email',
         'phone_number',
+        'whatsapp_number',
+        'emergency_phone',
         'house_address',
         'parent_name',
         'parent_phone',

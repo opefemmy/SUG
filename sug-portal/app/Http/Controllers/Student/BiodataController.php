@@ -53,6 +53,8 @@ class BiodataController extends Controller
             'middle_name' => 'nullable|string|max:255',
             'email' => 'required|email|unique:student_biodata,email,' . ($biodata ? $biodata->id : 'NULL'),
             'phone_number' => 'required|string',
+            'whatsapp_number' => 'required|string',
+            'emergency_phone' => 'required|string',
             'house_address' => 'required|string',
             'parent_name' => 'required|string',
             'parent_phone' => 'required|string',
@@ -65,7 +67,8 @@ class BiodataController extends Controller
 
         $data = $request->only([
             'first_name', 'last_name', 'middle_name', 'email',
-            'phone_number', 'house_address', 'parent_name',
+            'phone_number', 'whatsapp_number', 'emergency_phone',
+            'house_address', 'parent_name',
             'parent_phone', 'parent_email'
         ]);
 
