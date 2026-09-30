@@ -26,14 +26,14 @@
             <p class="text-xs text-blue-500 mt-2 italic">Note: Matric number will be used as username and Surname as temporary password.</p>
         </div>
 
-        <form action="{{ route('students.import.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.students.import.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 transition-colors cursor-pointer relative">
-                <input type="file" name="csv_file" class="absolute inset-0 opacity-0 cursor-pointer">
+                <input type="file" name="csv_file" id="csv_file" class="absolute inset-0 opacity-0 cursor-pointer" onchange="updateFileName()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.//8 0 4 4 0 01 8 0m-7 7H7m0-7l7-7 7 7M12 3v12" />
                 </svg>
-                <p class="text-lg font-medium text-gray-700">Click or Drag CSV file here to upload</p>
+                <p id="upload-text" class="text-lg font-medium text-gray-700">Click or Drag CSV file here to upload</p>
                 <p class="text-sm text-gray-500 mt-1">Only .csv or .txt files are accepted</p>
             </div>
             <div class="mt-6 flex justify-center">
@@ -43,6 +43,12 @@
             </div>
         </form>
     </div>
+
+    @if(session('error'))
+        <div class="mb-6 p-4 rounded-lg bg-red-100 border border-red-400 text-red-700">
+            {{ session('error') }}
+        </div>
+    @endif
 
     @if(session('import_results'))
         <div class="mt-8 p-6 bg-white rounded-xl shadow-sm border border-gray-200">
@@ -68,4 +74,20 @@
         </div>
     @endif
 </div>
+
+<script>
+    function updateFileName() {
+        const input = document.getElementById('csv_file');
+        const text = document.getElementById('upload-text');
+        if (input.files && input.files.length > 0) {
+            text.innerText = 'Selected: ' + input.files[0].name;
+            text.classList.remove('text-gray-700');
+            text.classList.add('text-blue-600', 'font-bold');
+        } else {
+            text.innerText = 'Click or Drag CSV file here to upload';
+            text.classList.remove('text-blue-600', 'font-bold');
+            text.classList.add('text-gray-700');
+        }
+    }
+</script>
 @endsection
