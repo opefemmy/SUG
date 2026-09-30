@@ -27,18 +27,15 @@ class StudentImportService
         foreach ($rows as $index => $row) {
             try {
                 DB::transaction(function () use ($row) {
-                    // Use matric_no as the username (stored in 'name' for auth simplicity or custom field)
-                    // We use matric_no as the email for authentication since Laravel's default Auth uses email
-                    // In a real scenario, we might override the Auth provider to use 'username'
+                    // Use matric_no as the username
                     $username = $row['matric_no'];
                     $password = $row['surname'];
 
                     // 1. Create User
-                    // We use matric_no as the email field to allow login with matric number
                     $user = User::updateOrCreate(
                         ['email' => $username],
                         [
-                            'name' => ($row['name'] ?? 'Student') . ' ' . ($row['surname'] ?? ''),
+                            'name' => ($row['first_name'] ?? 'Student') . ' ' . ($row['surname'] ?? ''),
                             'password' => Hash::make($password),
                         ]
                     );
@@ -82,8 +79,9 @@ class StudentImportService
                     \App\Models\StudentBiodata::updateOrCreate(
                         ['student_id' => $student->id],
                         [
-                            'first_name' => $row['name'],
-                            'last_name' => $row['surname'],
+                            'first_name' => $row['first_name'] ?? '',
+                            'last_name' => $row['surname'] ?? '',
+                            'middle_name' => $row['middle_name'] ?? null,
                             'email' => $username, // Fallback to matric_no as email
                             'is_completed' => false,
                         ]
