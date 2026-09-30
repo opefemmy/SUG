@@ -101,13 +101,29 @@ class FeeController extends Controller
         }
 
         // Get enabled gateways from settings
-        $enabledGatewaysString = $this->settingsService->get('payments.enabled_gateways', 'paystack');
-        $enabledGateways = explode(',', $enabledGatewaysString);
+        $enabledGatewaysString = $this->settingsService->get('enabled_gateways', 'paystack');
+
+        // If the above didn't work, check if it's stored as 'payments.enabled_gateways'
+        if ($enabledGatewaysString === 'paystack' && !$this->settingsService->get('enabled_gateways')) {
+            $enabledGatewaysString = $this->settingsService->get('payments.enabled_gateways', 'paystack');
+        }
+
+        $enabledGateways = array_filter(explode(',', $enabledGatewaysString));
+        if (empty($enabledGateways)) {
+            $enabledGateways = ['paystack'];
+        }
 
         // Fetch logos for enabled gateways
         $gatewayLogos = [];
         foreach ($enabledGateways as $gateway) {
-            $gatewayLogos[$gateway] = $this->settingsService->get("payments.{$gateway}_logo");
+            $logoPath = $this->settingsService->get("{$gateway}_logo");
+
+            // Fallback if the key was saved as 'payments.gateway_logo'
+            if (!$logoPath) {
+                $logoPath = $this->settingsService->get("payments.{$gateway}_logo");
+            }
+
+            $gatewayLogos[$gateway] = $logoPath;
         }
 
         return view('student.fees.select_gateway', [
@@ -133,8 +149,14 @@ class FeeController extends Controller
         $selectedGateway = $request->gateway;
 
         // Validate that the selected gateway is enabled
-        $enabledGatewaysString = $this->settingsService->get('payments.enabled_gateways', 'paystack');
-        $enabledGateways = explode(',', $enabledGatewaysString);
+        $enabledGatewaysString = $this->settingsService->get('enabled_gateways', 'paystack');
+
+        // Fallback check
+        if ($enabledGatewaysString === 'paystack' && !$this->settingsService->get('enabled_gateways')) {
+            $enabledGatewaysString = $this->settingsService->get('payments.enabled_gateways', 'paystack');
+        }
+
+        $enabledGateways = array_filter(explode(',', $enabledGatewaysString));
 
         if (!in_array($selectedGateway, $enabledGateways)) {
             return redirect()->route('student.fees.pay')
