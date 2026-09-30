@@ -33,6 +33,10 @@ class PaymentConfigController extends Controller
             'opay_secret_key' => '',
             'opay_base_url' => 'https://testapi.opaycheckout.com/api/v1/international',
             'opay_pay_method' => '',
+            'quickteller_merchant_id' => '',
+            'quickteller_api_key' => '',
+            'quickteller_api_secret' => '',
+            'quickteller_base_url' => 'https://stg-api.quickteller.com/api/v1',
         ];
 
         $config = array_merge($defaultKeys, $config);
@@ -43,7 +47,7 @@ class PaymentConfigController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'payments.active_gateway' => 'required|in:paystack,flutterwave,remita,opay',
+            'payments.active_gateway' => 'required|in:paystack,flutterwave,remita,opay,quickteller',
             'payments.paystack_public_key' => 'nullable|string',
             'payments.paystack_secret_key' => 'nullable|string',
             'payments.flutterwave_public_key' => 'nullable|string',
@@ -55,6 +59,10 @@ class PaymentConfigController extends Controller
             'payments.opay_secret_key' => 'nullable|string',
             'payments.opay_base_url' => 'nullable|string',
             'payments.opay_pay_method' => 'nullable|string',
+            'payments.quickteller_merchant_id' => 'nullable|string',
+            'payments.quickteller_api_key' => 'nullable|string',
+            'payments.quickteller_api_secret' => 'nullable|string',
+            'payments.quickteller_base_url' => 'nullable|string',
         ]);
 
         foreach ($request->payments as $key => $value) {

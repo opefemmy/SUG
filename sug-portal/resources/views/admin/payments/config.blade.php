@@ -38,6 +38,10 @@
                             <input type="radio" name="payments[active_gateway]" value="opay" {{ $config['active_gateway'] == 'opay' ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
                             <span class="text-gray-700 font-medium">OPay</span>
                         </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="payments[active_gateway]" value="quickteller" {{ $config['active_gateway'] == 'quickteller' ? 'checked' : '' }} class="w-4 h-4 text-blue-600">
+                            <span class="text-gray-700 font-medium">Quickteller</span>
+                        </label>
                     </div>
                 </div>
 
@@ -124,6 +128,31 @@
                                     <option value="OPayAccount" {{ $config['opay_pay_method'] == 'OPayAccount' ? 'selected' : '' }}>OPay Account</option>
                                 </select>
                                 <p class="text-[10px] text-gray-400 mt-1 italic">Leave as "Show All" to let students choose their method.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quickteller Config -->
+                    <div class="p-4 border rounded-xl bg-gray-50">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="w-2 h-6 bg-red-600 rounded mr-2"></span> Quickteller
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Merchant ID</label>
+                                <input type="text" name="payments[quickteller_merchant_id]" value="{{ $config['quickteller_merchant_id'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">API Key</label>
+                                <input type="text" name="payments[quickteller_api_key]" value="{{ $config['quickteller_api_key'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">API Secret</label>
+                                <input type="password" name="payments[quickteller_api_secret]" value="{{ $config['quickteller_api_secret'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Base URL</label>
+                                <input type="text" name="payments[quickteller_base_url]" value="{{ $config['quickteller_base_url'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
                             </div>
                         </div>
                     </div>

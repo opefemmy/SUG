@@ -10,6 +10,7 @@ use App\Services\Payments\PaystackGateway;
 use App\Services\Payments\FlutterwaveGateway;
 use App\Services\Payments\RemitaGateway;
 use App\Services\Payments\OpayGateway;
+use App\Services\Payments\QuicktellerGateway;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
@@ -22,13 +23,15 @@ class PaymentService
         PaystackGateway $paystack,
         FlutterwaveGateway $flutterwave,
         RemitaGateway $remita,
-        OpayGateway $opay
+        OpayGateway $opay,
+        QuicktellerGateway $quickteller
     ) {
         $this->gateways = [
             'paystack' => $paystack,
             'flutterwave' => $flutterwave,
             'remita' => $remita,
             'opay' => $opay,
+            'quickteller' => $quickteller,
         ];
     }
 
