@@ -83,11 +83,6 @@ class StudentImportService
                             'last_name' => $row['last_name'] ?? '',
                             'middle_name' => $row['middle_name'] ?? null,
                             'email' => $username, // Fallback to matric_no as email
-                            'phone_number' => 'Not Provided',
-                            'house_address' => 'Not Provided',
-                            'parent_name' => 'Not Provided',
-                            'parent_phone' => 'Not Provided',
-                            'parent_email' => $username . '@example.com',
                             'is_completed' => false,
                         ]
                     );

@@ -42,11 +42,11 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Phone Number</label>
-                            <input type="text" name="phone_number" value="{{ old('phone_number', $biodata->phone_number ?? '') }}" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required>
+                            <input type="text" name="phone_number" value="{{ old('phone_number', $biodata->phone_number ?? '') }}" placeholder="Click to enter" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">House Address</label>
-                            <input type="text" name="house_address" value="{{ old('house_address', $biodata->house_address ?? '') }}" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required>
+                            <input type="text" name="house_address" value="{{ old('house_address', $biodata->house_address ?? '') }}" placeholder="Click to enter" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required>
                         </div>
                     </div>
                 </div>
@@ -92,16 +92,16 @@
                         <div class="border-t pt-4 space-y-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Parent's Full Name</label>
-                                <input type="text" name="parent_name" value="{{ old('parent_name', $biodata->parent_name ?? '') }}" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required>
+                                <input type="text" name="parent_name" value="{{ old('parent_name', $biodata->parent_name ?? '') }}" placeholder="Click to enter" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 mb-1">Parent's Phone</label>
-                                    <input type="text" name="parent_phone" value="{{ old('parent_phone', $biodata->parent_phone ?? '') }}" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required>
+                                    <input type="text" name="parent_phone" value="{{ old('parent_phone', $biodata->parent_phone ?? '') }}" placeholder="Click to enter" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-600 mb-1">Parent's Email</label>
-                                    <input type="email" name="parent_email" value="{{ old('parent_email', $biodata->parent_email ?? '') }}" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required>
+                                    <input type="email" name="parent_email" value="{{ old('parent_email', $biodata->parent_email ?? '') }}" placeholder="Click to enter" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all" required>
                                 </div>
                             </div>
                         </div>
@@ -150,9 +150,8 @@ function biodataForm() {
                 return;
             }
             try {
-                const response = await fetch(`/student/api/departments?school_id=${this.schoolId}`);
+                const response = await fetch(`/student/biodata/departments?school_id=${this.schoolId}`);
                 this.departments = await response.json();
-                // If the current department is not in the new list, reset it
                 if (this.departmentId && !this.departments.find(d => d.id == this.departmentId)) {
                     this.departmentId = '';
                     this.programmeId = '';
@@ -168,9 +167,8 @@ function biodataForm() {
                 return;
             }
             try {
-                const response = await fetch(`/student/api/programmes?department_id=${this.departmentId}`);
+                const response = await fetch(`/student/biodata/programmes?department_id=${this.departmentId}`);
                 this.programmes = await response.json();
-                // If the current programme is not in the new list, reset it
                 if (this.programmeId && !this.programmes.find(p => p.id == this.programmeId)) {
                     this.programmeId = '';
                 }
