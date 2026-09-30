@@ -29,13 +29,13 @@ class StudentImportService
                 DB::transaction(function () use ($row) {
                     // Use matric_no as the username
                     $username = $row['matric_no'];
-                    $password = $row['surname'];
+                    $password = $row['last_name'];
 
                     // 1. Create User
                     $user = User::updateOrCreate(
                         ['email' => $username],
                         [
-                            'name' => ($row['first_name'] ?? 'Student') . ' ' . ($row['surname'] ?? ''),
+                            'name' => ($row['first_name'] ?? 'Student') . ' ' . ($row['last_name'] ?? ''),
                             'password' => Hash::make($password),
                         ]
                     );
@@ -60,7 +60,7 @@ class StudentImportService
                     $matricParts = explode('/', $username);
                     $admissionYear = (isset($matricParts[1]) && is_numeric($matricParts[1]))
                         ? (int)$matricParts[1]
-                        : now()->year;
+                        : now()->year();
 
                     $student = Student::updateOrCreate(
                         ['user_id' => $user->id],
@@ -80,7 +80,7 @@ class StudentImportService
                         ['student_id' => $student->id],
                         [
                             'first_name' => $row['first_name'] ?? '',
-                            'last_name' => $row['surname'] ?? '',
+                            'last_name' => $row['last_name'] ?? '',
                             'middle_name' => $row['middle_name'] ?? null,
                             'email' => $username, // Fallback to matric_no as email
                             'is_completed' => false,

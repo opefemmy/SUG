@@ -42,7 +42,7 @@ class StudentImportController extends Controller
         }, $header);
 
         // Validate required headers exist
-        $required = ['matric_no', 'surname', 'first_name', 'department', 'level'];
+        $required = ['matric_no', 'last_name', 'first_name', 'department', 'level'];
         foreach ($required as $req) {
             if (!in_array($req, $header)) {
                 fclose($handle);

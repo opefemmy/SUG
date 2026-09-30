@@ -14,7 +14,7 @@
             <div class="flex items-center justify-between bg-white p-3 rounded border border-blue-200">
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-xs font-mono">
                     <div class="p-1 bg-gray-50 rounded border">matric_no</div>
-                    <div class="p-1 bg-gray-50 rounded border">surname</div>
+                    <div class="p-1 bg-gray-50 rounded border">last_name</div>
                     <div class="p-1 bg-gray-50 rounded border">first_name</div>
                     <div class="p-1 bg-gray-50 rounded border">middle_name</div>
                     <div class="p-1 bg-gray-50 rounded border">department</div>
