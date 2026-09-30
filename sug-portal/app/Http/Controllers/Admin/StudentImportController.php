@@ -36,9 +36,16 @@ class StudentImportController extends Controller
             return back()->with('error', 'The uploaded CSV file is empty.');
         }
 
-        // Clean headers: remove BOM and trim whitespace
+        // Clean headers: remove BOM, trim whitespace, and convert to lowercase
         $header = array_map(function($h) {
-            return trim(preg_replace('/^\xEF\xBB\xBF/', '', $h));
+            return strtolower(trim(preg_replace('/^\xEF\xBB\xBF/', '', $h)));
+        }, $header);
+
+        // Map common variations to our required names
+        $header = array_map(function($h) {
+            if (in_array($h, ['surname', 'lastname', 'last name'])) return 'last_name';
+            if (in_array($h, ['name', 'first name'])) return 'first_name';
+            return $h;
         }, $header);
 
         // Validate required headers exist
@@ -46,7 +53,7 @@ class StudentImportController extends Controller
         foreach ($required as $req) {
             if (!in_array($req, $header)) {
                 fclose($handle);
-                return back()->with('error', "Missing required CSV column: {$req}");
+                return back()->with('error', "Missing required CSV column: {$req}. Please ensure your CSV has headers for matric_no, last_name, first_name, department, and level.");
             }
         }
 
