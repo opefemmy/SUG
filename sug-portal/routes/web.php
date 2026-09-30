@@ -112,6 +112,7 @@ Route::prefix('student')->name('student.')->group(function () {
     // Fees
     Route::get('/fees', [StudentFeeController::class, 'index'])->name('fees');
     Route::get('/fees/pay', [StudentFeeController::class, 'pay'])->name('fees.pay');
+    Route::post('/fees/process', [StudentFeeController::class, 'processPayment'])->name('fees.process');
     Route::get('/fees/requery/{reference}', [StudentFeeController::class, 'requery'])->name('fees.requery');
 
     //H Elections
@@ -161,6 +162,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
     Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class);
     Route::get('fees', [\App\Http\Controllers\Admin\FeeController::class, 'index'])->name('fees.index');
+    Route::get('fees/create', [\App\Http\Controllers\Admin\FeeController::class, 'create'])->name('fees.create');
+    Route::post('fees', [\App\Http\Controllers\Admin\FeeController::class, 'store'])->name('fees.store');
+    Route::get('fees/{fee}/edit', [\App\Http\Controllers\Admin\FeeController::class, 'edit'])->name('fees.edit');
+    Route::put('fees/{fee}', [\App\Http\Controllers\Admin\FeeController::class, 'update'])->name('fees.update');
+    Route::delete('fees/{fee}', [\App\Http\Controllers\Admin\FeeController::class, 'destroy'])->name('fees.destroy');
     Route::get('debtors', [\App\Http\Controllers\Admin\DebtorController::class, 'index'])->name('debtors.index');
     Route::resource('payments-config', \App\Http\Controllers\Admin\PaymentConfigController::class)->names([
         'index' => 'payments.config.index'
