@@ -72,6 +72,11 @@ class BiodataController extends Controller
             'parent_phone', 'parent_email'
         ]);
 
+        // Update the User's email address to the one provided in biodata
+        $user = Auth::user();
+        $user->email = $request->email;
+        $user->save();
+
         if ($request->hasFile('passport')) {
             $path = $request->file('passport')->store('passports', 'public');
             $data['passport_path'] = $path;

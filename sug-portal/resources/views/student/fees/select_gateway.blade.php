@@ -3,6 +3,18 @@
 @section('content')
 <div class="container mx-auto px-6 py-8">
     <div class="max-w-2xl mx-auto">
+        <!-- Error Alert -->
+        @if(session('error'))
+            <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded shadow-sm animate-fade-in">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="font-medium">{{ session('error') }}</span>
+                </div>
+            </div>
+        @endif
+
         <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
             <div class="bg-indigo-900 px-6 py-8 text-center">
                 <h1 class="text-2xl font-bold text-white">Select Payment Method</h1>
@@ -11,7 +23,7 @@
 
             <form action="{{ route('student.fees.process') }}" method="POST" class="p-8">
                 @csrf
-                <input type="hidden" name="fee_id" value="{{ request('fee_id') }}">
+                <input type="hidden" name="fee_id" value="{{ $fee->id }}">
 
                 <div class="grid grid-cols-1 gap-4 mb-8">
                     @foreach($enabledGateways as $gateway)
@@ -75,7 +87,7 @@
                             &larr; Back to Fees
                         </a>
                         <button type="submit" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-lg">
-                            Click to Proceed to Payment
+                            Proceed to Payment
                         </button>
                     </div>
                 </div>

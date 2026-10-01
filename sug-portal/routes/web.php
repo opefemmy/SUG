@@ -18,9 +18,10 @@ use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 use App\Http\Controllers\Student\FeeController as StudentFeeController;
 use App\Http\Controllers\Student\VotingController as StudentVotingController;
 use App\Http\Controllers\Student\SupportController as StudentSupportController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingController as AdminSettingController;
-use App\Http\Controllers\Admin\SettingController as AdminDashboardController; // Note: This was aliased to SettingController
 use App\Services\SettingsService;
+use App\Http\Controllers\Admin\SupportTicketController;
 
 Route::get('/', function() {
     return view('public.index', [
@@ -114,14 +115,21 @@ Route::prefix('student')->name('student.')->group(function () {
     Route::get('/fees/pay', [StudentFeeController::class, 'pay'])->name('fees.pay');
     Route::post('/fees/process', [StudentFeeController::class, 'processPayment'])->name('fees.process');
     Route::get('/fees/requery/{reference}', [StudentFeeController::class, 'requery'])->name('fees.requery');
+    Route::post('/fees/verify-manual', [StudentFeeController::class, 'verifyManual'])->name('fees.verifyManual');
 
-    //H Elections
+    // Elections
     Route::get('/elections', [StudentVotingController::class, 'index'])->name('elections.index');
 
     // Support
     Route::get('/support', [StudentSupportController::class, 'index'])->name('support.index');
     Route::post('/support', [StudentSupportController::class, 'store'])->name('support.store');
+
+    // Payment Complaints
+    Route::get('/payment-complaints', [\App\Http\Controllers\Student\PaymentComplaintController::class, 'index'])->name('complaints.index');
+    Route::get('/payment-complaints/create', [\App\Http\Controllers\Student\PaymentComplaintController::class, 'create'])->name('complaints.create');
+    Route::post('/payment-complaints', [\App\Http\Controllers\Student\PaymentComplaintController::class, 'store'])->name('complaints.store');
 });
+
 
 // Defining receipt.download outside the student. prefix group to match the view's route('receipt.download')
 Route::get('/student/receipts/download/{id}', [StudentReceiptController::class, 'download'])->name('receipt.download');
@@ -130,6 +138,12 @@ Route::get('/student/receipts/download/{id}', [StudentReceiptController::class, 
 Route::get('/verify/receipt/{payment_id}', function($payment_id) {
     return "Verification for Receipt #$payment_id: This is a valid payment record in the SUG Portal system.";
 })->name('receipt.verify');
+
+// Payment Callback Route
+Route::get('/payment/callback', [\App\Http\Controllers\Student\FeeController::class, 'callback'])->name('payment.callback');
+Route::post('/payment/callback', [\App\Http\Controllers\Student\FeeController::class, 'callback'])->name('payment.callback');
+// OPay Webhook Route
+Route::post('/payment/webhook/opay', [\App\Http\Controllers\Student\FeeController::class, 'opayWebhook'])->name('payment.webhook.opay');
 
 // Settings Routes
 Route::prefix('admin')->group(function () {
@@ -141,12 +155,11 @@ Route::prefix('admin')->group(function () {
 });
 
 Route::prefix('admin')->name('admin.')->group(function () {
-    // Using AdminSettingController here because AdminDashboardController was just an alias for it
-    Route::get('/dashboard', [AdminSettingController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('administration', AdministrationController::class);
     Route::post('administration/{administration}/assign_officer', [AdministrationController::class, 'assignOfficer'])->name('administration.assign_officer');
     Route::put('administration/officers/{officer}/update', [AdministrationController::class, 'updateOfficer'])->name('administration.update_officer');
-    Route::delete('administration/officers/{officer}', [AdministrationController::class, 'removeOfficer'])->name('administration.remove_officer');
+    Route::delete('administration/officers/{officer}', [AdministrationController::class, 'remove_officer'])->name('administration.remove_officer');
     Route::resource('news', AdminNewsController::class);
 
     // Academic Routes
@@ -174,7 +187,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     ]);
     Route::get('fees', [\App\Http\Controllers\Admin\FeeController::class, 'index'])->name('fees.index');
     Route::get('fees/create', [\App\Http\Controllers\Admin\FeeController::class, 'create'])->name('fees.create');
-    Route::post('fees', [\App\Http\Controllers\Admin\FeeController::class, 'store'])->name('fees.store');
     Route::get('fees/{fee}/edit', [\App\Http\Controllers\Admin\FeeController::class, 'edit'])->name('fees.edit');
     Route::put('fees/{fee}', [\App\Http\Controllers\Admin\FeeController::class, 'update'])->name('fees.update');
     Route::delete('fees/{fee}', [\App\Http\Controllers\Admin\FeeController::class, 'destroy'])->name('fees.destroy');
@@ -190,12 +202,26 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Student Services
     Route::get('students/import', [\App\Http\Controllers\Admin\StudentImportController::class, 'index'])->name('students.import.index');
     Route::post('students/import', [\App\Http\Controllers\Admin\StudentImportController::class, 'store'])->name('students.import.store');
+
+    // Payment Complaints Management
+    Route::prefix('payment-complaints')->name('payment.complaints.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'index'])->name('index');
+        Route::get('/{id}', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'show'])->name('show');
+        Route::post('/{id}/verify', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'verify'])->name('verify');
+        Route::post('/{id}/reject', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'reject'])->name('reject');
+    });
+
+    // Support Tickets
+    Route::prefix('support')->name('support.')->group(function () {
+        Route::get('/', [SupportTicketController::class, 'index'])->name('index');
+        Route::get('/{id}', [SupportTicketController::class, 'show'])->name('show');
+        Route::post('/{id}/status', [SupportTicketController::class, 'updateStatus'])->name('update_status');
+    });
 });
 
-// Public Routes
 Route::get('/news', function() {
     return view('public.news', [
-        'news' => \App\Models\News::with('category')->paginate(10),
+        'news' => \App\Models\News::with('category')->latest()->paginate(10),
         'settings' => [
             'nav_home' => SettingsService::get('nav_home'),
             'nav_about' => SettingsService::get('nav_about'),
@@ -211,5 +237,4 @@ Route::get('/news', function() {
     ]);
 })->name('news');
 
-Route::get('/executives', [PublicExecutiveController::class, 'index'])->name('executives.index');
-Route::get('/news/{slug', [PublicNewsController::class, 'show'])->name('news.show');
+Route::get('/news/{slug}', [PublicNewsController::class, 'show'])->name('news.show');

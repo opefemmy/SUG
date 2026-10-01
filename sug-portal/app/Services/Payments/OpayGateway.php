@@ -15,7 +15,6 @@ class OpayGateway extends PaymentGatewayInterface
     {
         $this->settings = $settings;
         // Default to staging. Production URL should be handled via settings.
-        // Correct base URL for Hosted Checkout Cashier API
         $this->baseUrl = $this->settings->get('opay_base_url', 'https://testapi.opaycheckout.com/api/v1/international');
     }
 
@@ -49,14 +48,17 @@ class OpayGateway extends PaymentGatewayInterface
             'reference' => $data['reference'],
         ];
 
-        // Only add payMethod if it is specifically configured in settings.
-        // Omitting it allows OPay to show ALL available payment methods to the student.
         if ($method = $this->settings->get('opay_pay_method')) {
             $payload['payMethod'] = $method;
         }
 
         try {
-            // Hosted Checkout (Cashier) uses the PUBLIC KEY in the Bearer token, not a signature.
+            Log::info("OPay: Initiating payment for reference {$data['reference']}", [
+                'merchantId' => $merchantId,
+                'baseUrl' => $this->baseUrl,
+                'payload' => $payload
+            ]);
+
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $publicKey,
                 'MerchantId' => $merchantId,
@@ -65,8 +67,6 @@ class OpayGateway extends PaymentGatewayInterface
 
             if ($response->successful()) {
                 $resData = $response->json();
-
-                // The API response puts the result inside a 'data' object
                 $dataPayload = $resData['data'] ?? [];
                 $cashierUrl = $dataPayload['cashierUrl'] ?? null;
 
@@ -86,8 +86,16 @@ class OpayGateway extends PaymentGatewayInterface
             );
 
         } catch (\App\Exceptions\Payments\PaymentGatewayException $e) {
+            Log::error("OPay Gateway Exception: " . $e->getMessage(), [
+                'reference' => $data['reference'],
+                'status' => $e->getCode()
+            ]);
             throw $e;
         } catch (\Exception $e) {
+            Log::error("OPay Connection Exception: " . $e->getMessage(), [
+                'reference' => $data['reference'],
+                'trace' => $e->getTraceAsString()
+            ]);
             throw new \App\Exceptions\Payments\PaymentGatewayException(
                 "OPay Connection Exception: " . $e->getMessage(),
                 500,
@@ -98,49 +106,87 @@ class OpayGateway extends PaymentGatewayInterface
 
     /**
      * Verify a transaction with OPay.
+     * Returns 'success', 'failed', or 'pending'.
      */
-    public function verifyTransaction(string $reference): bool
+    public function verifyTransaction(string $reference): string
     {
         $merchantId = $this->settings->get('opay_merchant_id');
-        $publicKey = $this->settings->get('opay_public_key');
+        $secretKey = $this->settings->get('opay_secret_key');
         $baseUrl = $this->baseUrl;
 
+        if (!$merchantId || !$secretKey) {
+            \Illuminate\Support\Facades\Log::error("OPay Verification failed: MerchantId or SecretKey is missing from settings.");
+            return 'pending';
+        }
+
         try {
+            // OPay status verification requires a signature of the request body
+            $payload = [
+                'reference' => $reference,
+                'country' => 'NG'
+            ];
+
+            $payloadJson = json_encode($payload, JSON_UNESCAPED_SLASHES);
+
+            // Try both HMAC-SHA512 and HMAC-SHA256 as some OPay versions differ
+            $signature = hash_hmac('sha512', $payloadJson, $secretKey);
+
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $publicKey,
+                'Authorization' => 'Bearer ' . $signature,
                 'MerchantId' => $merchantId,
                 'Content-Type' => 'application/json',
-            ])->get($this->baseUrl . '/payment/status', ['reference' => $reference]);
+            ])->post($this->baseUrl . '/cashier/status', $payload);
 
             if ($response->successful()) {
                 $resData = $response->json();
-                Log::debug("OPay Verification Response for {$reference}:", $resData);
+                \Illuminate\Support\Facades\Log::info("OPay Verification Raw Response for {$reference}:", $resData);
 
-                $status = strtolower($resData['status'] ?? $resData['data']['status'] ?? '');
+                $status = strtolower(
+                    $resData['status'] ??
+                    ($resData['data']['status'] ?? null) ??
+                    ($resData['data']['paymentStatus'] ?? null) ??
+                    ($resData['data']['state'] ?? null) ??
+                    ''
+                );
 
-                // PRODUCTION MODE: Strictly require a success status
-                if (!str_contains($baseUrl, 'testapi') && !str_contains($baseUrl, 'sandbox')) {
-                    return in_array($status, ['successful', 'success', 'completed']);
+                \Illuminate\Support\Facades\Log::info("OPay Parsed Status for {$reference}: {$status}");
+
+                if (in_array($status, ['successful', 'success', 'completed', 'paid', 'captured'])) {
+                    return 'success';
                 }
 
-                // SANDBOX MODE:
-                // If OPay returns ANY status (including 'initial', 'pending', etc.)
-                // and the response was successful (200 OK), we treat it as a success
-                // to avoid blocking development during sandbox delays.
-                if (!empty($status)) {
-                    return true;
+                if (in_array($status, ['failed', 'cancelled', 'reversed', 'declined'])) {
+                    return 'failed';
                 }
 
-                // If the response is successful but status is missing, check if 'data' exists at all
-                return isset($resData['data']);
+                return !empty($status) ? 'pending' : 'pending';
             }
 
-            Log::error("OPay Verification API failed with status: " . $response->status() . " Body: " . $response->body());
+            // If 401/403, try the alternative SHA256 signature as a fallback
+            if (in_array($response->status(), [401, 403])) {
+                \Illuminate\Support\Facades\Log::info("OPay SHA512 failed, trying SHA256 fallback for {$reference}");
+                $signature256 = hash_hmac('sha256', $payloadJson, $secretKey);
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $signature256,
+                    'MerchantId' => $merchantId,
+                    'Content-Type' => 'application/json',
+                ])->post($this->baseUrl . '/cashier/status', $payload);
+
+                if ($response->successful()) {
+                    $resData = $response->json();
+                    $status = strtolower($resData['status'] ?? ($resData['data']['status'] ?? ''));
+                    if (in_array($status, ['successful', 'success', 'completed', 'paid', 'captured'])) {
+                        return 'success';
+                    }
+                }
+            }
+
+            \Illuminate\Support\Facades\Log::error("OPay Verification API failed with status: " . $response->status() . " Body: " . $response->body());
         } catch (\Exception $e) {
-            Log::error("OPay Verification Exception: " . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error("OPay Verification Exception: " . $e->getMessage());
         }
 
-        return false;
+        return 'pending';
     }
 
     /**
@@ -158,6 +204,6 @@ class OpayGateway extends PaymentGatewayInterface
             return false;
         }
 
-        return isset($payload['status']) && $payload['status'] === 'SUCCESSFUL';
+        return isset($payload['status']) && ($payload['status'] === 'SUCCESSFUL' || strtolower($payload['status']) === 'success');
     }
 }
