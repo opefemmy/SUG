@@ -30,6 +30,7 @@
                     <th class="p-4 font-bold border-b">Amount</th>
                     <th class="p-4 font-bold border-b">Status</th>
                     <th class="p-4 font-bold border-b">Date</th>
+                    <th class="p-4 font-bold border-b text-center">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,8 +48,22 @@
                             </span>
                         </td>
                         <td class="p-4 text-sm text-gray-500">{{ $payment->created_at->format('M d, Y H:i') }}</td>
+                        <td class="p-4 text-center">
+                            @if(str_contains($payment->receipt->receipt_no ?? '', 'MANUAL'))
+                                <form action="{{ route('admin.payments.history.mark_unpaid', $payment->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove this manual payment? This will mark the student as unpaid.');">
+                                    @csrf
+                                    @method('POST')
+                                    <button type="submit" class="bg-red-100 text-red-600 px-3 py-1 rounded text-xs font-bold hover:bg-red-200 transition border border-red-200">
+                                        Mark Unpaid
+                                    </button>
+                                </form>
+                            @else
+                                <span class="text-gray-400 text-xs italic">Portal Payment</span>
+                            @endif
+                        </td>
                     </tr>
                 @empty
+
                     <tr>
                         <td colspan="5" class="p-8 text-center text-gray-500">No payments found.</td>
                     </tr>

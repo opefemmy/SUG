@@ -118,6 +118,8 @@
                         </svg>
                     </button>
                     <div x-show="activeMenu === 'student'" x-cloak class="pl-10 space-y-1 mt-1">
+                        <a href="{{ route('admin.students.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.students.*') ? 'bg-slate-800' : '' }}">Manage Students</a>
+                        <a href="{{ route('admin.promotion.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.promotion.*') ? 'bg-slate-800' : '' }}">Bulk Promotion</a>
                         <a href="{{ route('admin.students.import.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.students.import.*') ? 'bg-slate-800' : '' }}">Bulk Import</a>
                         <a href="{{ route('admin.payment.complaints.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.payment.complaints.*') ? 'bg-slate-800' : '' }}">Payment Complaints</a>
                         <a href="{{ route('admin.support.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.support.*') ? 'bg-slate-800' : '' }}">Support Tickets</a>

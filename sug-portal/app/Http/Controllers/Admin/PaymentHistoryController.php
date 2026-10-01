@@ -26,4 +26,28 @@ class PaymentHistoryController extends Controller
 
         return view('admin.payments.history', compact('payments'));
     }
+
+    /**
+     * Mark a manual payment as unpaid (delete the payment and associated receipt).
+     */
+    public function markAsUnpaid($id)
+    {
+        try {
+            $payment = Payment::findOrFail($id);
+
+            // We only allow removing payments that weren't initiated via the portal (no transaction_ref or specific manual flag)
+            // Or simply allow admin to remove any payment as requested.
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($payment) {
+                // Delete associated receipt first
+                \App\Models\Receipt::where('payment_id', $payment->id)->delete();
+                // Delete the payment
+                $payment->delete();
+            });
+
+            return redirect()->back()->with('success', 'Payment removed successfully. Student is now marked as unpaid.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to remove payment: ' . $e->getMessage());
+        }
+    }
 }

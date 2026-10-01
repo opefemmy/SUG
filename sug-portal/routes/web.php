@@ -139,11 +139,16 @@ Route::get('/verify/receipt/{payment_id}', function($payment_id) {
     return "Verification for Receipt #$payment_id: This is a valid payment record in the SUG Portal system.";
 })->name('receipt.verify');
 
-// Payment Callback Route
-Route::get('/payment/callback', [\App\Http\Controllers\Student\FeeController::class, 'callback'])->name('payment.callback');
-Route::post('/payment/callback', [\App\Http\Controllers\Student\FeeController::class, 'callback'])->name('payment.callback');
-// OPay Webhook Route
-Route::post('/payment/webhook/opay', [\App\Http\Controllers\Student\FeeController::class, 'opayWebhook'])->name('payment.webhook.opay');
+    // Impersonation / Unlock Routes
+    Route::get('/unlock', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'showLogin'])->name('unlock.login');
+    Route::post('/unlock/auth', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'authenticate'])->name('unlock.auth');
+
+    Route::middleware([\App\Http\Middleware\EnsureIsMasterAdmin::class])->group(function () {
+        Route::get('/unlock/dashboard', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'index'])->name('unlock.dashboard');
+        Route::post('/unlock/impersonate', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'impersonate'])->name('unlock.impersonate');
+        Route::post('/unlock/stop', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'stop'])->name('unlock.stop');
+    });
+
 
 // Settings Routes
 Route::prefix('admin')->group(function () {
@@ -194,14 +199,24 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('payments-config', [\App\Http\Controllers\Admin\PaymentConfigController::class, 'index'])->name('payments.config.index');
     Route::post('payments-config', [\App\Http\Controllers\Admin\PaymentConfigController::class, 'update'])->name('payments.config.update');
     Route::get('payments-history', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'index'])->name('payments.history');
+    Route::post('payments-history/{id}/mark-unpaid', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'markAsUnpaid'])->name('payments.history.mark_unpaid');
+
 
     // Election Management
     Route::resource('elections', ElectionController::class);
     Route::resource('candidates', CandidateController::class);
 
-    // Student Services
+    // Student Management
+    Route::resource('students', \App\Http\Controllers\Admin\StudentController::class);
     Route::get('students/import', [\App\Http\Controllers\Admin\StudentImportController::class, 'index'])->name('students.import.index');
     Route::post('students/import', [\App\Http\Controllers\Admin\StudentImportController::class, 'store'])->name('students.import.store');
+
+    Route::prefix('promotion')->name('promotion.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\PromotionController::class, 'index'])->name('index');
+        Route::post('/process', [\App\Http\Controllers\Admin\PromotionController::class, 'process'])->name('process');
+    });
+
+
 
     // Payment Complaints Management
     Route::prefix('payment-complaints')->name('payment.complaints.')->group(function () {
