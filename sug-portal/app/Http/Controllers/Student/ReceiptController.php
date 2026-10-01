@@ -55,14 +55,20 @@ class ReceiptController extends Controller
         // Check if a formal receipt record exists, otherwise create one
         $receipt = Receipt::firstOrCreate(
             ['payment_id' => $payment->id],
-            ['receipt_number' => 'REC-' . strtoupper(uniqid())]
+            ['receipt_no' => 'REC-' . strtoupper(uniqid())]
         );
+
+        // Resolve logo path for DomPDF
+        $logoPath = $this->settingsService->get('site_logo');
+        $fullLogoPath = $logoPath
+            ? storage_path('app/public/' . $logoPath)
+            : storage_path('app/public/branding/1790506165_new logo.png');
 
         // Resolve passport path for DomPDF
         $passportPath = $student->biodata->passport_path ?? null;
         $fullPassportPath = $passportPath
             ? storage_path('app/public/' . $passportPath)
-            : storage_path('app/public/defaults/student-placeholder.png');
+            : storage_path('app/public/passports/0kI2hdEgLSRszpMzm4nR6nhw7TLK7oF1IFknPnbB.jpg');
 
         // Generate Verification QR Code
         $verificationUrl = route('receipt.verify', ['payment_id' => $payment->id]);
@@ -78,6 +84,7 @@ class ReceiptController extends Controller
             'payment',
             'student',
             'settings',
+            'fullLogoPath',
             'fullPassportPath',
             'qrCodeBase64',
             'receipt'

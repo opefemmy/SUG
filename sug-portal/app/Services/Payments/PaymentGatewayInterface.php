@@ -15,10 +15,11 @@ class PaymentGatewayInterface
 
     /**
      * Verify a transaction with the gateway.
+     * Returns 'success', 'failed', or 'pending'.
      */
-    public function verifyTransaction(string $reference): bool
+    public function verifyTransaction(string $reference): string
     {
-        return false;
+        return 'pending';
     }
 
     /**

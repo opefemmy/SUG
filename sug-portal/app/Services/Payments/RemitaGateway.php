@@ -35,16 +35,24 @@ class RemitaGateway extends PaymentGatewayInterface
         return [];
     }
 
-    public function verifyTransaction(string $reference): bool
+    public function verifyTransaction(string $reference): string
     {
         $response = Http::withHeaders(['apikey' => $this->apiKey])
             ->get("https://remita.net/remita/exapp/api/v1/payments/{$reference}");
 
-        if ($response->successful() && $response->json()['status'] === 'success') {
-            return true;
+        if ($response->successful()) {
+            $status = $response->json()['status'] ?? 'pending';
+
+            if ($status === 'success') {
+                return 'success';
+            }
+
+            if ($status === 'failed') {
+                return 'failed';
+            }
         }
 
-        return false;
+        return 'pending';
     }
 
     public function handleWebhook(array $payload, string $signature): bool

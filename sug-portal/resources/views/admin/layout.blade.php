@@ -119,6 +119,8 @@
                     </button>
                     <div x-show="activeMenu === 'student'" x-cloak class="pl-10 space-y-1 mt-1">
                         <a href="{{ route('admin.students.import.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.students.import.*') ? 'bg-slate-800' : '' }}">Bulk Import</a>
+                        <a href="{{ route('admin.payment.complaints.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.payment.complaints.*') ? 'bg-slate-800' : '' }}">Payment Complaints</a>
+                        <a href="{{ route('admin.support.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.support.*') ? 'bg-slate-800' : '' }}">Support Tickets</a>
                     </div>
                 </div>
 
@@ -188,8 +190,8 @@
                         </button>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-600">{{ Auth::user()->name }}</span>
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=random" class="h-8 w-8 rounded-full border" alt="User avatar">
+                    <span class="text-sm text-gray-600">{{ Auth::user()->name ?? 'Admin' }}</span>
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'Admin') }}&background=random" class="h-8 w-8 rounded-full border" alt="User avatar">
                 </div>
             </header>
 

@@ -40,16 +40,24 @@ class FlutterwaveGateway extends PaymentGatewayInterface
         return [];
     }
 
-    public function verifyTransaction(string $reference): bool
+    public function verifyTransaction(string $reference): string
     {
         $response = Http::withToken($this->secretKey)
             ->get("https://api.flutterwave.com/v3/transactions/{$reference}/verify");
 
-        if ($response->successful() && $response->json()['data']['status'] === 'successful') {
-            return true;
+        if ($response->successful()) {
+            $status = $response->json()['data']['status'] ?? 'pending';
+
+            if ($status === 'successful') {
+                return 'success';
+            }
+
+            if ($status === 'failed') {
+                return 'failed';
+            }
         }
 
-        return false;
+        return 'pending';
     }
 
     public function handleWebhook(array $payload, string $signature): bool

@@ -7,9 +7,12 @@ use Illuminate\Http\Request;
 use App\Models\Payment;
 use App\Models\FeeStructure;
 use App\Models\Student;
+use App\Models\Receipt;
 use App\Services\PaymentService;
 use App\Services\SettingsService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class FeeController extends Controller
 {
@@ -21,6 +24,7 @@ class FeeController extends Controller
         $this->paymentService = $paymentService;
         $this->settingsService = $settingsService;
     }
+
     /**
      * Display the student's fee payment history and total fees to be paid.
      */
@@ -41,9 +45,13 @@ class FeeController extends Controller
             ->with('feeType')
             ->get();
 
-        // Filter out fees that have already been paid successfully by this student
+        // We create a separate collection for the manual verification dropdown.
+        // This collection includes ALL required fees, regardless of whether they have been paid,
+        // because a student might be verifying a payment that hasn't registered yet.
+        $verificationFees = collect($requiredFees->all());
+
+        // Filter out fees that have already been paid successfully for the main list
         $requiredFees = $requiredFees->filter(function ($fee) use ($student) {
-            // Primary check: Direct link to this fee structure
             $hasDirectPayment = Payment::where('student_id', $student->id)
                 ->where('fee_structure_id', $fee->id)
                 ->whereIn('status', ['success', 'successful', 'completed'])
@@ -51,8 +59,6 @@ class FeeController extends Controller
 
             if ($hasDirectPayment) return false;
 
-            // Fallback check: Any successful payment of the same amount in the same session
-            // This handles cases where the fee structure might have been recreated or modified
             $hasEquivalentPayment = Payment::where('student_id', $student->id)
                 ->where('amount', $fee->amount)
                 ->whereIn('status', ['success', 'successful', 'completed'])
@@ -69,6 +75,7 @@ class FeeController extends Controller
         return view('student.fees.index', [
             'payments' => $payments,
             'requiredFees' => $requiredFees,
+            'verificationFees' => $verificationFees,
             'student' => $student
         ]);
     }
@@ -80,7 +87,6 @@ class FeeController extends Controller
     {
         $student = Student::where('user_id', Auth::id())->firstOrFail();
 
-        // Determine which fee the student is paying.
         $fee = FeeStructure::where('session_id', $student->session_id)
             ->where(function($query) use ($student) {
                 $query->where('level_id', $student->current_level_id)
@@ -100,10 +106,7 @@ class FeeController extends Controller
                 ->with('error', 'No outstanding fees found for your profile.');
         }
 
-        // Get enabled gateways from settings
         $enabledGatewaysString = $this->settingsService->get('enabled_gateways', 'paystack');
-
-        // If the above didn't work, check if it's stored as 'payments.enabled_gateways'
         if ($enabledGatewaysString === 'paystack' && !$this->settingsService->get('enabled_gateways')) {
             $enabledGatewaysString = $this->settingsService->get('payments.enabled_gateways', 'paystack');
         }
@@ -113,16 +116,12 @@ class FeeController extends Controller
             $enabledGateways = ['paystack'];
         }
 
-        // Fetch logos for enabled gateways
         $gatewayLogos = [];
         foreach ($enabledGateways as $gateway) {
             $logoPath = $this->settingsService->get("{$gateway}_logo");
-
-            // Fallback if the key was saved as 'payments.gateway_logo'
             if (!$logoPath) {
                 $logoPath = $this->settingsService->get("payments.{$gateway}_logo");
             }
-
             $gatewayLogos[$gateway] = $logoPath;
         }
 
@@ -148,10 +147,7 @@ class FeeController extends Controller
         $fee = FeeStructure::findOrFail($request->fee_id);
         $selectedGateway = $request->gateway;
 
-        // Validate that the selected gateway is enabled
         $enabledGatewaysString = $this->settingsService->get('enabled_gateways', 'paystack');
-
-        // Fallback check
         if ($enabledGatewaysString === 'paystack' && !$this->settingsService->get('enabled_gateways')) {
             $enabledGatewaysString = $this->settingsService->get('payments.enabled_gateways', 'paystack');
         }
@@ -164,43 +160,129 @@ class FeeController extends Controller
         }
 
         try {
-            // Initialize payment via the PaymentService
             $result = $this->paymentService->initiatePayment($student, $fee, $selectedGateway);
-
-            // Redirect student to the gateway's payment URL
             return redirect()->away($result['gateway_data']['payment_url']);
-
         } catch (\Exception $e) {
             return redirect()->route('student.fees.pay')
                 ->with('error', 'Payment failed to initialize: ' . $e->getMessage());
         }
     }
 
-    /**
-     * Re-verify a specific payment.
-     */
-    public function requery($reference)
+    public function requery(Request $request, $reference)
     {
-        $payment = Payment::where('transaction_ref', $reference)->firstOrFail();
-
-        if (Auth::id() !== $payment->student->user_id) {
-            abort(403, 'Unauthorized action.');
-        }
-
         try {
             $isVerified = $this->paymentService->verifyPayment($reference);
 
             if ($isVerified) {
                 return redirect()->route('student.fees')
-                    ->with('success', 'Payment successfully synchronized! Your receipt is now available.');
+                    ->with('success', 'Payment verified successfully! Your receipt is now available.');
             }
 
             return redirect()->route('student.fees')
-                ->with('error', 'Payment is still pending or failed. Please wait a few moments or contact support.');
+                ->with('info', 'Your payment is still being processed by the gateway. Please wait a few moments and try again, or check your transaction history in your payment app.');
 
         } catch (\Exception $e) {
+            Log::error("Payment Requery Error for {$reference}: " . $e->getMessage());
             return redirect()->route('student.fees')
-                ->with('error', 'Error while synchronizing payment: ' . $e->getMessage());
+                ->with('error', 'An error occurred while verifying your payment. Please try again later.');
+        }
+    }
+
+    /**
+     * Manually verify a payment using a transaction ID.
+     */
+    public function verifyManual(Request $request)
+    {
+        $request->validate([
+            'transaction_id' => 'required|string',
+            'fee_id' => 'required|exists:fee_structures,id',
+            'gateway' => 'required|string',
+        ]);
+
+        $student = Student::where('user_id', Auth::id())->firstOrFail();
+        $fee = FeeStructure::findOrFail($request->fee_id);
+
+        try {
+            $status = $this->paymentService->verifyGenericPayment($request->transaction_id, $request->gateway);
+
+            if ($status === 'success') {
+                DB::transaction(function () use ($student, $fee, $request) {
+                    $payment = Payment::firstOrNew([
+                        'transaction_ref' => $request->transaction_id
+                    ]);
+
+                    $payment->fill([
+                        'student_id' => $student->id,
+                        'fee_structure_id' => $fee->id,
+                        'amount' => $fee->amount,
+                        'payment_gateway' => $request->gateway,
+                        'status' => 'success',
+                        'payment_date' => now(),
+                    ]);
+                    $payment->save();
+
+                    Receipt::firstOrCreate([
+                        'payment_id' => $payment->id,
+                    ], [
+                        'receipt_no' => 'MANUAL-' . strtoupper(uniqid()),
+                        'issued_at' => now(),
+                    ]);
+                });
+
+                return redirect()->route('student.fees')
+                    ->with('success', 'Manual verification successful! Your payment has been activated.');
+            }
+
+            return redirect()->route('student.fees')
+                ->with($status === 'failed' ? 'error' : 'info',
+                       $status === 'failed' ? 'The gateway reported this transaction as failed.' : 'The transaction is still pending. Please try again later.');
+
+        } catch (\Exception $e) {
+            Log::error("Manual Verification Error: " . $e->getMessage());
+            return redirect()->route('student.fees')->with('error', 'An error occurred during verification.');
+        }
+    }
+
+    public function callback(Request $request)
+    {
+        $reference = $request->query('reference') ?? $request->input('reference');
+        if (!$reference) {
+            return redirect()->route('student.fees')->with('error', 'Invalid payment callback: No reference provided.');
+        }
+
+        try {
+            $isVerified = $this->paymentService->verifyPayment($reference);
+            if ($isVerified) {
+                return redirect()->route('student.fees')->with('success', 'Payment successful! Your receipt is now available.');
+            }
+            return redirect()->route('student.fees')->with('error', 'Payment verification failed. Please check your payment status.');
+        } catch (\Exception $e) {
+            Log::error("Payment Callback Error: " . $e->getMessage());
+            return redirect()->route('student.fees')->with('error', 'An error occurred while verifying your payment.');
+        }
+    }
+
+    public function opayWebhook(Request $request)
+    {
+        $payload = $request->all();
+        $signature = $request->header('Opay-Signature');
+
+        try {
+            $opay = app(\App\Services\Payments\OpayGateway::class);
+            $isValid = $opay->handleWebhook($payload, $signature);
+
+            if ($isValid) {
+                $reference = $payload['reference'] ?? null;
+                if ($reference) {
+                    $this->paymentService->verifyPayment($reference);
+                    return response()->json(['status' => 'success', 'message' => 'Webhook processed'], 200);
+                }
+            }
+
+            return response()->json(['status' => 'error', 'message' => 'Invalid webhook signature'], 400);
+        } catch (\Exception $e) {
+            Log::error("OPay Webhook Error: " . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => 'Internal Server Error'], 500);
         }
     }
 }

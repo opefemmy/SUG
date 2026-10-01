@@ -85,8 +85,9 @@ class QuicktellerGateway extends PaymentGatewayInterface
 
     /**
      * Verify a transaction with Quickteller.
+     * Returns 'success', 'failed', or 'pending'.
      */
-    public function verifyTransaction(string $reference): bool
+    public function verifyTransaction(string $reference): string
     {
         $merchantId = $this->settings->get('quickteller_merchant_id');
         $apiKey = $this->settings->get('quickteller_api_key');
@@ -105,17 +106,19 @@ class QuicktellerGateway extends PaymentGatewayInterface
 
                 $status = strtolower($resData['status'] ?? $resData['data']['status'] ?? '');
 
-                // PRODUCTION MODE: Strictly require success
-                if (!str_contains($baseUrl, 'stg') && !str_contains($baseUrl, 'sandbox')) {
-                    return in_array($status, ['successful', 'success', 'completed']);
+                if (in_array($status, ['successful', 'success', 'completed'])) {
+                    return 'success';
                 }
 
-                // SANDBOX MODE: Accept any non-empty status as success to facilitate testing
+                if (in_array($status, ['failed', 'cancelled', 'reversed'])) {
+                    return 'failed';
+                }
+
                 if (!empty($status)) {
-                    return true;
+                    return 'pending';
                 }
 
-                return isset($resData['data']);
+                return isset($resData['data']) ? 'pending' : 'failed';
             }
 
             Log::error("Quickteller Verification API failed with status: " . $response->status() . " Body: " . $response->body());
@@ -123,7 +126,7 @@ class QuicktellerGateway extends PaymentGatewayInterface
             Log::error("Quickteller Verification Exception: " . $e->getMessage());
         }
 
-        return false;
+        return 'pending';
     }
 
     /**

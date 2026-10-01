@@ -2,6 +2,47 @@
 
 @section('content')
 <div class="space-y-8">
+    <!-- Flash Messages -->
+    @if(session('success') || session('error') || session('info'))
+        <div class="fixed top-4 right-4 z-50 max-w-md w-full space-y-3">
+            @if(session('success'))
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded shadow-md flex items-start space-x-3 animate-bounce-in">
+                    <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    <div>
+                        <p class="text-sm font-bold text-green-800">Success</p>
+                        <p class="text-sm text-green-700">{{ session('success') }}</p>
+                    </div>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="bg-red-600 border-l-4 border-red-800 p-4 rounded shadow-md flex items-start space-x-3 text-white">
+                    <svg class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414V14a1 1 0 102 0v-2.586l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586V7.293z" clip-rule="evenodd" />
+                    </svg>
+                    <div>
+                        <p class="text-sm font-bold text-white">Error</p>
+                        <p class="text-sm text-red-100">{{ session('error') }}</p>
+                    </div>
+                </div>
+            @endif
+
+            @if(session('info'))
+                <div class="bg-red-600 border-l-4 border-red-800 p-4 rounded shadow-md flex items-start space-x-3 text-white">
+                    <svg class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                    <div>
+                        <p class="text-sm font-bold text-white">Information</p>
+                        <p class="text-sm text-red-100">{{ session('info') }}</p>
+                    </div>
+                </div>
+            @endif
+        </div>
+    @endif
+
     <div class="flex items-center justify-between">
         <h1 class="text-2xl font-bold text-gray-800">My Fee Management</h1>
         <a href="{{ route('student.dashboard') }}" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium">
@@ -12,13 +53,18 @@
     <!-- Fees to Pay Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.5 0-3 .5-3 2s1.5 2 3 2 3-1 3-2-1.5-2-3-2z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h10a2 2 0 012 2v14a2 2 0 01-2 2z" />
-                </svg>
-                Fees to be Paid
-            </h3>
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.5 0-3 .5-3 2s1.5 2 3 2 3-1 3-2-1.5-2-3-2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h10a2 2 0 012 2v14a2 2 0 01-2 2z" />
+                    </svg>
+                    Fees to be Paid
+                </h3>
+                <a href="{{ route('student.complaints.create') }}" class="text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 px-2 py-1 rounded border border-red-100 transition">
+                    Report Payment Issue
+                </a>
+            </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
@@ -50,37 +96,41 @@
             </div>
         </div>
 
-        <!-- Summary Card -->
-        <div class="{{ $requiredFees->isEmpty() ? 'bg-green-600' : 'bg-indigo-900' }} rounded-2xl p-6 text-white shadow-lg transition-colors">
-            <h3 class="text-lg font-bold mb-4">{{ $requiredFees->isEmpty() ? 'Payment Status' : 'Payment Summary' }}</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <span class="{{ $requiredFees->isEmpty() ? 'text-green-100' : 'text-indigo-200' }} text-sm">
-                        {{ $requiredFees->isEmpty() ? 'Balance Due:' : 'Total Required:' }}
-                    </span>
-                    <span class="text-xl font-bold">
-                        ₦{{ $requiredFees->isEmpty() ? '0.00' : number_format($requiredFees->sum('amount'), 2) }}
-                    </span>
+        <!-- Manual Verification Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <h3 class="text-md font-bold text-gray-800 mb-4 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Verify Manual Payment
+            </h3>
+            <form action="{{ route('student.fees.verifyManual') }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Select Fee Paid</label>
+                    <select name="fee_id" class="w-full p-2 text-sm border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                        <option value="">Select Fee</option>
+                        @foreach($verificationFees as $fee)
+                            <option value="{{ $fee->id }}">{{ $fee->feeType->name }} (₦{{ number_format($fee->amount, 2) }})</option>
+                        @endforeach
+                    </select>
                 </div>
-                <div class="pt-4 border-t {{ $requiredFees->isEmpty() ? 'border-green-500' : 'border-indigo-800' }}">
-                    @if($requiredFees->isEmpty())
-                        <div class="flex items-center justify-center space-x-2 mb-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-300" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-//-C15.35 12.34 13.5 11.5 12 11.5s-1.5.84-1.5 1.5m-1-1.5V14m1-1.5V14" clip-rule="evenodd" />
-                            </svg>
-                            <p class="text-sm font-medium text-green-100">You are fully cleared for this session!</p>
-                        </div>
-                        <a href="{{ route('student.receipts') }}" class="w-full block text-center bg-white text-green-600 py-2 rounded-xl font-bold hover:bg-green-50 transition-colors">
-                            View All Receipts
-                        </a>
-                    @else
-                        <p class="text-xs text-indigo-300 mb-4">Ready to make payment? Contact the SUG treasury or use the payment portal when available.</p>
-                        <a href="{{ route('student.fees.pay') }}" class="w-full block text-center bg-white text-indigo-900 py-2 rounded-xl font-bold hover:bg-indigo-50 transition-colors">
-                            Pay Now
-                        </a>
-                    @endif
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Transaction ID</label>
+                    <input type="text" name="transaction_id" class="w-full p-2 text-sm border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="e.g. SUG-XXXXX" required>
                 </div>
-            </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">Payment Gateway</label>
+                    <select name="gateway" class="w-full p-2 text-sm border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                        <option value="opay">OPay</option>
+                        <option value="paystack">Paystack</option>
+                        <option value="flutterwave">Flutterwave</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-bold hover:bg-indigo-700 transition shadow-sm">
+                    Verify Now
+                </button>
+            </form>
         </div>
     </div>
 
@@ -131,13 +181,13 @@
                                 </a>
                             </td>
                         </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-12 text-center text-gray-500">
-                                    No payment records found.
-                                </td>
-                            </tr>
-                        @endforelse
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                                No payment records found.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>

@@ -83,13 +83,22 @@ class PaymentService
     public function verifyPayment(string $reference): bool
     {
         $payment = Payment::where('transaction_ref', $reference)->firstOrFail();
+
+        // 1. If already successful, return true immediately to prevent "success-to-failed" flip
+        if ($payment->status === 'success') {
+            return true;
+        }
+
         $gateway = $this->gateways[$payment->payment_gateway] ?? null;
 
         if (!$gateway) {
             throw new Exception("Gateway configuration not found for this payment.");
         }
 
-        if ($gateway->verifyTransaction($reference)) {
+        // 2. Get granular status from gateway ('success', 'failed', 'pending')
+        $status = $gateway->verifyTransaction($reference);
+
+        if ($status === 'success') {
             DB::transaction(function () use ($payment) {
                 $payment->update([
                     'status' => 'success',
@@ -101,7 +110,27 @@ class PaymentService
             return true;
         }
 
-        $payment->update(['status' => 'failed']);
+        if ($status === 'failed') {
+            $payment->update(['status' => 'failed']);
+            return false;
+        }
+
+        // 3. If status is 'pending' or unknown, do NOT update the database.
+        // Just return false so the controller can tell the user it's still pending.
         return false;
+    }
+
+    /**
+     * Verify a payment using a reference and a specific gateway.
+     * Bypasses the need for an existing Payment record.
+     */
+    public function verifyGenericPayment(string $reference, string $gatewayName): string
+    {
+        if (!isset($this->gateways[$gatewayName])) {
+            throw new Exception("Unsupported payment gateway: {$gatewayName}");
+        }
+
+        $gateway = $this->gateways[$gatewayName];
+        return $gateway->verifyTransaction($reference);
     }
 }

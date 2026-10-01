@@ -53,7 +53,7 @@ class SettingController extends Controller
             $this->settingsService->set($key, $value, $group);
         }
 
-        return redirect()->route('settings.index')->with('success', 'Settings updated successfully.');
+        return redirect()->route('admin.dashboard')->with('success', 'Settings updated successfully.');
     }
 
     public function uploadSliderImage(Request $request): RedirectResponse
@@ -74,13 +74,13 @@ class SettingController extends Controller
             $request->file('image')
         );
 
-        return redirect()->route('settings.index')->with('success', 'Slider image uploaded successfully.');
+        return redirect()->route('admin.dashboard')->with('success', 'Slider image uploaded successfully.');
     }
 
     public function destroySliderImage($id): RedirectResponse
     {
         $this->heroSliderService->removeSlide($id);
-        return redirect()->route('settings.index')->with('success', 'Slider image removed successfully.');
+        return redirect()->route('admin.dashboard')->with('success', 'Slider image removed successfully.');
     }
 
     public function updateSliderImage(Request $request, $id): RedirectResponse
@@ -98,7 +98,7 @@ class SettingController extends Controller
 
         $this->heroSliderService->updateSlide($id, $request->all());
 
-        return redirect()->route('settings.index')->with('success', 'Slider image updated successfully.');
+        return redirect()->route('admin.dashboard')->with('success', 'Slider image updated successfully.');
     }
 
     protected function determineGroup(string $key): string

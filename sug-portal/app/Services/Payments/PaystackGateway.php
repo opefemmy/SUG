@@ -32,16 +32,24 @@ class PaystackGateway extends PaymentGatewayInterface
         return [];
     }
 
-    public function verifyTransaction(string $reference): bool
+    public function verifyTransaction(string $reference): string
     {
         $response = Http::withToken($this->secretKey)
             ->get("https://api.paystack.co/transaction/verify/{$reference}");
 
-        if ($response->successful() && $response->json()['data']['status'] === 'success') {
-            return true;
+        if ($response->successful()) {
+            $status = $response->json()['data']['status'] ?? 'pending';
+
+            if ($status === 'success') {
+                return 'success';
+            }
+
+            if ($status === 'failed') {
+                return 'failed';
+            }
         }
 
-        return false;
+        return 'pending';
     }
 
     public function handleWebhook(array $payload, string $signature): bool
