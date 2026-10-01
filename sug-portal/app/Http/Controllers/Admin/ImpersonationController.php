@@ -20,6 +20,10 @@ class ImpersonationController extends Controller
      */
     public function showLogin(): View
     {
+        if (Session::get('is_master_admin')) {
+            return redirect()->route('unlock.dashboard');
+        }
+
         return view('admin.unlock.login');
     }
 
