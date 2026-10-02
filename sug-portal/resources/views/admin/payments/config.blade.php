@@ -204,16 +204,20 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Merchant ID</label>
-                                <input type="text" name="payments[quickteller_merchant_id]" value="{{ $config['quickteller_merchant_id'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Merchant Code</label>
+                                <input type="text" name="payments[quickteller_merchant_code]" value="{{ $config['quickteller_merchant_code'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">API Key</label>
-                                <input type="text" name="payments[quickteller_api_key]" value="{{ $config['quickteller_api_key'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Payable Code</label>
+                                <input type="text" name="payments[quickteller_payable_code]" value="{{ $config['quickteller_payable_code'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
                             </div>
                             <div>
-                                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">API Secret</label>
-                                <input type="password" name="payments[quickteller_api_secret]" value="{{ $config['quickteller_api_secret'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Client ID</label>
+                                <input type="text" name="payments[quickteller_client_id]" value="{{ $config['quickteller_client_id'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Secret</label>
+                                <input type="password" name="payments[quickteller_secret]" value="{{ $config['quickteller_secret'] }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-gray-500 uppercase mb-1">Base URL</label>

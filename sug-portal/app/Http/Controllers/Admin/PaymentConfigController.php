@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class PaymentConfigController extends Controller
 {
@@ -15,7 +17,7 @@ class PaymentConfigController extends Controller
         $this->settingsService = $settingsService;
     }
 
-    public function index()
+    public function index(): View
     {
         $config = $this->settingsService->getGroup('payments');
 
@@ -37,10 +39,11 @@ class PaymentConfigController extends Controller
             'opay_base_url' => 'https://testapi.opaycheckout.com/api/v1/international',
             'opay_pay_method' => '',
             'opay_logo' => '',
-            'quickteller_merchant_id' => '',
-            'quickteller_api_key' => '',
-            'quickteller_api_secret' => '',
-            'quickteller_base_url' => 'https://stg-api.quickteller.com/api/v1',
+            'quickteller_merchant_code' => '',
+            'quickteller_payable_code' => '',
+            'quickteller_client_id' => '',
+            'quickteller_secret' => '',
+            'quickteller_base_url' => 'https://sandbox.interswitchng.com/paymentgateway/api/v1',
             'quickteller_logo' => '',
         ];
 
@@ -49,7 +52,7 @@ class PaymentConfigController extends Controller
         return view('admin.payments.config', compact('config'));
     }
 
-    public function update(Request $request)
+    public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'payments.enabled_gateways' => 'required|array',
@@ -68,9 +71,10 @@ class PaymentConfigController extends Controller
             'payments.opay_base_url' => 'nullable|string',
             'payments.opay_pay_method' => 'nullable|string',
             'payments.opay_logo' => 'nullable|image|max:2048',
-            'payments.quickteller_merchant_id' => 'nullable|string',
-            'payments.quickteller_api_key' => 'nullable|string',
-            'payments.quickteller_api_secret' => 'nullable|string',
+            'payments.quickteller_merchant_code' => 'nullable|string',
+            'payments.quickteller_payable_code' => 'nullable|string',
+            'payments.quickteller_client_id' => 'nullable|string',
+            'payments.quickteller_secret' => 'nullable|string',
             'payments.quickteller_base_url' => 'nullable|string',
             'payments.quickteller_logo' => 'nullable|image|max:2048',
         ]);
@@ -86,9 +90,6 @@ class PaymentConfigController extends Controller
                 $saveValue = $file->storeAs('branding/payments', $filename, 'public');
             }
 
-            // Save with the key as is, but in the 'payments' group.
-            // If we want it to be accessible as 'payments.enabled_gateways',
-            // we should be consistent about whether the dot is in the key itself or handled by the service.
             $this->settingsService->set($key, $saveValue, 'payments');
         }
 
