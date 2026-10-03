@@ -9,13 +9,23 @@
             <p class="text-indigo-100 text-sm mt-1">Official SUG Portal Receipt Validation</p>
         </div>
 
-        <div class="p-8">
+        <div class="p-8 relative">
+            <!-- Watermark Logo -->
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden opacity-5 select-none">
+                @php $logo = \App\Services\SettingsService::get('brand_logo'); @endphp
+                @if($logo)
+                    <img src="{{ asset('storage/' . $logo) }}" class="w-96 h-96 object-contain rotate-12" alt="Watermark">
+                @else
+                    <i class="fas fa-university text-[200px] rotate-12"></i>
+                @endif
+            </div>
+
             <!-- Student Photo Section -->
             <div class="flex flex-col items-center mb-8">
                 <div class="relative">
                     <div class="w-32 h-32 rounded-full border-4 border-indigo-500 overflow-hidden bg-gray-200 shadow-lg">
                         @if($payment->student->biodata && $payment->student->biodata->passport_path)
-                            <img src="{{ asset('storage/' . $payment->student->biodata->passport_path) }}" class="w-full h-full object-cover" alt="Student Passport">
+                            <img src="{{ asset('storage/' . $payment->student->biodata->passport_path) }}" class="w-full h-full object-cover object-top" alt="Student Passport">
                         @else
                             <div class="w-full h-full flex items-center justify-center text-gray-400">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
