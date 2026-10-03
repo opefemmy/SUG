@@ -24,7 +24,7 @@
         }
     </style>
 </head>
-<body class="flex items-center justify-center h-screen">
+<body class="flex items-center justify-center h-screen relative">
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md login-overlay">
         <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">{{ \App\Services\SettingsService::get('site_name', 'SUG Portal') }} Login</h2>
 
@@ -64,5 +64,10 @@
             {{-- Registration link removed as requested --}}
         </div>
     </div>
+
+    <footer class="absolute bottom-4 w-full text-center text-xs text-gray-600 font-medium drop-shadow-sm">
+        &copy; 2026 EKSCOTECH SUG PORTAL Portal. All rights reserved. <br>
+        Powered by the Directorate of ICT
+    </footer>
 </body>
 </html>

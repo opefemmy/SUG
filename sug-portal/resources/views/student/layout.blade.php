@@ -174,45 +174,50 @@
                 </div>
             </header>
 
-<div class="content-area flex-1 overflow-y-auto bg-gray-50">
-    <div class="max-w-7xl mx-auto p-6 lg:p-8">
-        <!-- Global Flash Messages -->
-        @if(session('success'))
-            <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-r-xl shadow-sm flex items-center justify-between" role="alert">
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-//-C15.35 12.34 13.5 11.5 12 11.5s-1.5.84-1.5 1.5m-1-1.5V14m1-1.5V14" clip-rule="evenodd" />
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L11 7.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="font-medium">{{ session('success') }}</span>
+    <div class="content-area flex-1 overflow-y-auto bg-gray-50 relative">
+        <div class="max-w-7xl mx-auto p-6 lg:p-8">
+            <!-- Global Flash Messages -->
+            @if(session('success'))
+                <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded-r-xl shadow-sm flex items-center justify-between" role="alert">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-//-C15.35 12.34 13.5 11.5 12 11.5s-1.5.84-1.5 1.5m-1-1.5V14m1-1.5V14" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L11 7.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="font-medium">{{ session('success') }}</span>
+                    </div>
+                    <button @click="this.parentElement.remove()" class="text-green-500 hover:text-green-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 12.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
                 </div>
-                <button @click="this.parentElement.remove()" class="text-green-500 hover:text-green-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 12.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-            </div>
-        @endif
+            @endif
 
-        @if(session('error'))
-            <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-r-xl shadow-sm flex items-center justify-between" role="alert">
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586l-1.293-1.293z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="font-medium">{{ session('error') }}</span>
+            @if(session('error'))
+                <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-r-xl shadow-sm flex items-center justify-between" role="alert">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0" />
+                            <path fill-rule="evenodd" d="M8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.56l-1.293-1.293z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="font-medium">{{ session('error') }}</span>
+                    </div>
+                    <button @click="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 12.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
                 </div>
-                <button @click="this.parentElement.remove()" class="text-red-500 hover:text-red-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414-1.414L10 12.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-            </div>
-        @endif
+            @endif
 
-        @yield('content')
+            @yield('content')
+        </div>
     </div>
-</div>
+    <footer class="absolute bottom-0 left-0 w-full py-4 text-center text-xs text-gray-500 bg-white border-t border-gray-200">
+        &copy; 2026 EKSCOTECH SUG PORTAL Portal. All rights reserved. <br>
+        Powered by the Directorate of ICT
+    </footer>
         </main>
     </div>
 </body>

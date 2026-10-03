@@ -100,7 +100,7 @@
                     </button>
                     <div x-show="activeMenu === 'users'" x-cloak class="pl-10 space-y-1 mt-1">
                         <a href="{{ route('admin.users.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-slate-800' : '' }}">Users</a>
-                        <a href="{{ route('admin.roles.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.roles.*') ? 'bg-slate-800' : '' }}">Roles</a>
+                        <a href="{{ route('admin.roles.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.roles.*') ? 'bg-slate-800' : '' }}">Holes</a>
                     </div>
                 </div>
 
@@ -182,14 +182,14 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 flex flex-col overflow-hidden">
+        <main class="main-content flex-1 flex flex-col overflow-hidden">
             <header class="bg-white shadow-sm z-10 h-16 flex items-center justify-between px-8">
                 <div class="flex items-center">
                     <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-md hover:bg-gray-100">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
-                        </button>
+                    </button>
                 </div>
                 <div class="flex items-center space-x-4">
                     <span class="text-sm text-gray-600">{{ Auth::user()->name ?? 'Admin' }}</span>
@@ -197,8 +197,13 @@
                 </div>
             </header>
 
-            <div class="flex-1 overflow-y-auto p-8">
+            <div class="flex-1 overflow-y-auto p-8 relative">
                 @yield('content')
+
+                <footer class="py-6 text-center text-xs text-gray-500 border-t border-gray-200">
+                    &copy; 2026 EKSCOTECH SUG PORTAL Portal. All rights reserved. <br>
+                    Powered by the Directorate of ICT
+                </footer>
             </div>
         </main>
     </div>

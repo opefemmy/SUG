@@ -269,6 +269,9 @@
         </div>
         <div class="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
             &copy; {{ date('Y') }} {{ $settings['site_name'] ?? 'Student Union Government' }} Portal. {{ $settings['footer_copyright'] ?? 'All rights reserved.' }}
+            <div class="mt-2 font-medium text-gray-400">
+                Powered by the Directorate of ICT
+            </div>
         </div>
     </footer>
 

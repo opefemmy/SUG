@@ -209,7 +209,6 @@
                     </td>
                 </tr>
             </table>
-
             <!-- Profile Section -->
             <div class="profile-section">
                 <div class="passport-frame">
@@ -236,7 +235,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Payment Details -->
             <table class="payment-grid">
                 <tr>
@@ -248,12 +246,10 @@
                     <td style="font-family: monospace; color: #64748b;">{{ $payment->transaction_ref }}</td>
                 </tr>
             </table>
-
             <div class="total-box">
                 <span class="total-label">Total Amount Paid</span>
                 <span class="total-amount">₦{{ number_format($payment->amount, 2) }}</span>
             </div>
-
             <!-- Verification -->
             <div class="verification-area">
                 <div class="qr-wrapper">
@@ -267,7 +263,6 @@
                     {{ $verificationUrl }}
                 </div>
             </div>
-
             <!-- Signatures -->
             <div class="signature-section">
                 <div class="sig-box" style="float: left;">
@@ -280,9 +275,9 @@
                 </div>
                 <div style="clear: both;"></div>
             </div>
-
             <div class="footer">
-                This is a computer-generated document. No signature is required for digital verification.
+                &copy; 2026 EKSCOTECH SUG PORTAL Portal. All rights reserved. <br>
+                Powered by the Directorate of ICT
             </div>
         </div>
     </div>

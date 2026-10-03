@@ -132,30 +132,33 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Back to Home Label</label>
                                     <input type="text" name="settings[nav_back_to_home]" value="{{ $settings['nav_back_to_home'] ?? 'Back to Home' }}" class="w-full p-2 border rounded-lg text-sm">
                                 </div>
-                                <div>
+                                <div class="md:col-span-2">
                                     <label class="block text-sm font-medium text-gray-700 mb-2">Copyright Text</label>
                                     <input type="text" name="settings[footer_copyright]" value="{{ $settings['footer_copyright'] ?? 'All rights reserved.' }}" class="w-full p-2 border rounded-lg text-sm">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Footer Attribution</label>
+                                    <input type="text" name="settings[footer_attribution]" value="{{ $settings['footer_attribution'] ?? 'Powered by the Directorate of ICT' }}" class="w-full p-2 border rounded-lg text-sm">
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Contact Information Section -->
-                <div>
-                    <h3 class="text-lg font-bold text-gray-700 mb-4 border-b pb-2">Contact Information</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
-                            <input type="email" name="settings[contact_email]" value="{{ $settings['contact_email'] ?? 'info@sugportal.com' }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Contact Phone</label>
-                            <input type="text" name="settings[contact_phone]" value="{{ $settings['contact_phone'] ?? '+234 000 000 0000' }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <!-- Contact Information Section -->
+                    <div class="mt-8">
+                        <h3 class="text-lg font-bold text-gray-700 mb-4 border-b pb-2">Contact Information</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
+                                <input type="email" name="settings[contact_email]" value="{{ $settings['contact_email'] ?? 'info@sugportal.com' }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Contact Phone</label>
+                                <input type="text" name="settings[contact_phone]" value="{{ $settings['contact_phone'] ?? '+234 000 000 0000' }}" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
                         </div>
                     </div>
                 </div>
-
             </div>
             <div class="bg-gray-50 px-6 py-4 flex justify-end">
                 <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">Save Settings</button>
