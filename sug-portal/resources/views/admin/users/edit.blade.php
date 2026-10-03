@@ -11,7 +11,7 @@
         <h1 class="text-2xl font-bold text-gray-800">Edit User</h1>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 max-w-2xl">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 max-w-4xl">
         <form action="{{ route('users.update', $user->id) }}" method="POST">
             @csrf
             @method('PUT')
@@ -43,12 +43,46 @@
                     </select>
                 </div>
                 <div class="col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Base Role</label>
                     <select name="role" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                         @foreach(\Spatie\Permission\Models\Role::all() as $role)
                             <option value="{{ $role->name }}" {{ old('role', $user->getRoleNames()->first()) === $role->name ? 'selected' : '' }}>{{ $role->name }}</option>
                         @endforeach
                     </select>
+                </div>
+
+                <!-- Granular Permissions Section -->
+                <div class="col-span-2 mt-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Granular Permissions</h3>
+                    <p class="text-sm text-gray-500 mb-4">Assign specific capabilities to this user. These will override or supplement the base role.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        @php
+                            $permissionGroups = [
+                                'User Management' => ['manage users', 'view users', 'edit users', 'delete users'],
+                                'Student Management' => ['view students', 'edit students', 'import students', 'promote students'],
+                                'Academic Management' => ['manage schools', 'manage departments', 'manage programmes', 'manage sessions', 'manage levels'],
+                                'Fee Management' => ['view fees', 'edit fees', 'view payments', 'mark unpaid'],
+                                'CMS/Settings' => ['edit settings', 'manage news', 'manage events', 'manage pages'],
+                                'Support/Complaints' => ['view complaints', 'verify complaints', 'manage support tickets'],
+                                'System' => ['impersonate users', 'view system logs'],
+                            ];
+                        @endphp
+
+                        @foreach($permissionGroups as $group => $permissions)
+                            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                <h4 class="font-bold text-sm text-gray-700 mb-3">{{ $group }}</h4>
+                                <div class="space-y-2">
+                                    @foreach($permissions as $permission)
+                                        <label class="flex items-center text-sm text-gray-600 cursor-pointer hover:text-gray-900">
+                                            <input type="checkbox" name="permissions[]" value="{{ $permission }}" class="rounded text-blue-600 mr-2" {{ $user->hasPermissionTo($permission) || (is_array(old('permissions')) && in_array($permission, old('permissions'))) ? 'checked' : '' }}>
+                                            {{ ucwords(str_replace(' ', '_', $permission)) }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
             <div class="mt-8 flex justify-end gap-3">

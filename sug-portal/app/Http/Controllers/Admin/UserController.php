@@ -46,6 +46,8 @@ class UserController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'status' => 'required|in:active,inactive',
             'role' => 'required|exists:roles,name',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'exists:permissions,name',
         ]);
 
         $user = User::create([
@@ -56,6 +58,10 @@ class UserController extends Controller
         ]);
 
         $this->rolePermissionService->assignRoleToUser($user, $validated['role']);
+
+        if ($request->has('permissions')) {
+            $user->syncPermissions($request->permissions);
+        }
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');
     }
@@ -73,6 +79,8 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'status' => 'required|in:active,inactive',
             'role' => 'required|exists:roles,name',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'exists:permissions,name',
         ]);
 
         $user->update([
@@ -86,6 +94,12 @@ class UserController extends Controller
         }
 
         $this->rolePermissionService->syncRolesForUser($user, [$validated['role']]);
+
+        if ($request->has('permissions')) {
+            $user->syncPermissions($request->permissions);
+        } else {
+            $user->syncPermissions([]);
+        }
 
         return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }

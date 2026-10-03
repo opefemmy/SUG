@@ -130,28 +130,24 @@ Route::prefix('student')->name('student.')->group(function () {
     Route::post('/payment-complaints', [\App\Http\Controllers\Student\PaymentComplaintController::class, 'store'])->name('complaints.store');
 });
 
-
 // Defining receipt.download outside the student. prefix group to match the view's route('receipt.download')
 Route::get('/student/receipts/download/{id}', [StudentReceiptController::class, 'download'])->name('receipt.download');
 
 // Receipt Verification Route
 Route::get('/verify/receipt/{payment_id}', [\App\Http\Controllers\Student\ReceiptVerificationController::class, 'verify'])->name('receipt.verify');
 
+// Impersonation / Unlock Routes
+Route::get('/unlock', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'showLogin'])->name('unlock.login');
+Route::post('/unlock/auth', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'authenticate'])->name('unlock.auth');
 
-
-    // Impersonation / Unlock Routes
-    Route::get('/unlock', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'showLogin'])->name('unlock.login');
-    Route::post('/unlock/auth', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'authenticate'])->name('unlock.auth');
-
-    Route::middleware([\App\Http\Middleware\EnsureIsMasterAdmin::class])->group(function () {
-        Route::get('/unlock/dashboard', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'index'])->name('unlock.dashboard');
-        Route::post('/unlock/impersonate', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'impersonate'])->name('unlock.impersonate');
-        Route::post('/unlock/stop', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'stop'])->name('unlock.stop');
-    });
-
+Route::middleware([\App\Http\Middleware\EnsureIsMasterAdmin::class])->group(function () {
+    Route::get('/unlock/dashboard', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'index'])->name('unlock.dashboard');
+    Route::post('/unlock/impersonate', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'impersonate'])->name('unlock.impersonate');
+    Route::post('/unlock/stop', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'stop'])->name('unlock.stop');
+});
 
 // Settings Routes
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->middleware('permission:edit settings')->group(function () {
     Route::get('/settings', [AdminSettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [AdminSettingController::class, 'update'])->name('settings.update');
     Route::post('/settings/slider/upload', [AdminSettingController::class, 'uploadSliderImage'])->name('settings.slider.upload');
@@ -161,76 +157,109 @@ Route::prefix('admin')->group(function () {
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('administration', AdministrationController::class);
-    Route::post('administration/{administration}/assign_officer', [AdministrationController::class, 'assignOfficer'])->name('administration.assign_officer');
-    Route::put('administration/officers/{officer}/update', [AdministrationController::class, 'updateOfficer'])->name('administration.update_officer');
-    Route::delete('administration/officers/{officer}', [AdministrationController::class, 'remove_officer'])->name('administration.remove_officer');
-    Route::resource('news', AdminNewsController::class);
 
-    // Academic Routes
-    Route::prefix('academic')->name('academic.')->group(function () {
-        Route::resource('schools', SchoolController::class);
-        Route::get('schools/template', [SchoolController::class, 'downloadTemplate'])->name('schools.template');
-        Route::post('schools/import', [SchoolController::class, 'import'])->name('schools.import');
-        Route::resource('departments', DepartmentController::class);
-        Route::resource('programmes', ProgrammeController::class);
-        Route::get('programmes/template', [ProgrammeController::class, 'downloadTemplate'])->name('programmes.template');
-        Route::post('programmes/import', [ProgrammeController::class, 'import'])->name('programmes.import');
-        Route::resource('sessions', \App\Http\Controllers\Admin\AcademicSessionController::class);
-        Route::resource('levels', \App\Http\Controllers\Admin\AcademicLevelController::class);
+    Route::middleware('permission:manage users')->group(function () {
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
     });
 
-    // Other Admin Resources
-    Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
-    Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class)->names([
-        'index' => 'roles.index',
-        'create' => 'roles.create',
-        'store' => 'roles.store',
-        'edit' => 'roles.edit',
-        'update' => 'roles.update',
-        'destroy' => 'roles.destroy',
-    ]);
-    Route::get('fees', [\App\Http\Controllers\Admin\FeeController::class, 'index'])->name('fees.index');
-    Route::get('fees/create', [\App\Http\Controllers\Admin\FeeController::class, 'create'])->name('fees.create');
-    Route::get('fees/{fee}/edit', [\App\Http\Controllers\Admin\FeeController::class, 'edit'])->name('fees.edit');
-    Route::put('fees/{fee}', [\App\Http\Controllers\Admin\FeeController::class, 'update'])->name('fees.update');
-    Route::delete('fees/{fee}', [\App\Http\Controllers\Admin\FeeController::class, 'destroy'])->name('fees.destroy');
-    Route::get('debtors', [\App\Http\Controllers\Admin\DebtorController::class, 'index'])->name('debtors.index');
-    Route::get('payments-config', [\App\Http\Controllers\Admin\PaymentConfigController::class, 'index'])->name('payments.config.index');
-    Route::post('payments-config', [\App\Http\Controllers\Admin\PaymentConfigController::class, 'update'])->name('payments.config.update');
-    Route::get('payments-history', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'index'])->name('payments.history');
-    Route::post('payments-history/{id}/mark-unpaid', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'markAsUnpaid'])->name('payments.history.mark_unpaid');
+    Route::middleware('permission:manage schools')->group(function () {
+        Route::resource('administration', AdministrationController::class);
+        Route::post('administration/{administration}/assign_officer', [AdministrationController::class, 'assignOfficer'])->name('administration.assign_officer');
+        Route::put('administration/officers/{officer}/update', [AdministrationController::class, 'updateOfficer'])->name('administration.update_officer');
+        Route::delete('administration/officers/{officer}/remove_officer', [AdministrationController::class, 'remove_officer'])->name('administration.remove_officer');
+    });
 
+    Route::middleware('permission:manage news')->group(function () {
+        Route::resource('news', AdminNewsController::class);
+    });
 
-    // Election Management
-    Route::resource('elections', ElectionController::class);
-    Route::resource('candidates', CandidateController::class);
+    Route::prefix('academic')->name('academic.')->group(function () {
+        Route::middleware('permission:manage schools')->group(function () {
+            Route::resource('schools', SchoolController::class);
+            Route::get('schools/template', [SchoolController::class, 'downloadTemplate'])->name('schools.template');
+            Route::post('schools/import', [SchoolController::class, 'import'])->name('schools.import');
+        });
+        Route::middleware('permission:manage departments')->group(function () {
+            Route::resource('departments', DepartmentController::class);
+        });
+        Route::middleware('permission:manage programmes')->group(function () {
+            Route::resource('programmes', ProgrammeController::class);
+            Route::get('programmes/template', [ProgrammeController::class, 'downloadTemplate'])->name('programmes.template');
+            Route::post('programmes/import', [ProgrammeController::class, 'import'])->name('programmes.import');
+        });
+        Route::middleware('permission:manage sessions')->group(function () {
+            Route::resource('sessions', \App\Http\Controllers\Admin\AcademicSessionController::class);
+        });
+        Route::middleware('permission:manage levels')->group(function () {
+            Route::resource('levels', \App\Http\Controllers\Admin\AcademicLevelController::class);
+        });
+    });
 
-    // Student Management
-    Route::resource('students', \App\Http\Controllers\Admin\StudentController::class);
-    Route::get('students/import', [\App\Http\Controllers\Admin\StudentImportController::class, 'index'])->name('students.import.index');
-    Route::post('students/import', [\App\Http\Controllers\Admin\StudentImportController::class, 'store'])->name('students.import.store');
+    Route::middleware('permission:manage users')->group(function () {
+        Route::resource('roles', \App\Http\Controllers\Admin\RoleController::class)->names([
+            'index' => 'roles.index',
+            'create' => 'roles.create',
+            'store' => 'roles.store',
+            'edit' => 'roles.edit',
+            'update' => 'roles.update',
+            'destroy' => 'roles.destroy',
+        ]);
+    });
+
+    Route::middleware('permission:view fees')->group(function () {
+        Route::get('fees', [\App\Http\Controllers\Admin\FeeController::class, 'index'])->name('fees.index');
+    });
+    Route::middleware('permission:edit fees')->group(function () {
+        Route::get('fees/create', [\App\Http\Controllers\Admin\FeeController::class, 'create'])->name('fees.create');
+        Route::get('fees/{fee}/edit', [\App\Http\Controllers\Admin\FeeController::class, 'edit'])->name('fees.edit');
+        Route::put('fees/{fee}', [\App\Http\Controllers\Admin\FeeController::class, 'update'])->name('fees.update');
+        Route::delete('fees/{fee}', [\App\Http\Controllers\Admin\FeeController::class, 'destroy'])->name('fees.destroy');
+    });
+    Route::middleware('permission:view payments')->group(function () {
+        Route::get('debtors', [\App\Http\Controllers\Admin\DebtorController::class, 'index'])->name('debtors.index');
+    });
+    Route::middleware('permission:view payments')->group(function () {
+        Route::get('payments-config', [\App\Http\Controllers\Admin\PaymentConfigController::class, 'index'])->name('payments.config.index');
+        Route::post('payments-config', [\App\Http\Controllers\Admin\PaymentConfigController::class, 'update'])->name('payments.config.update');
+    });
+    Route::middleware('permission:view payments')->group(function () {
+        Route::get('payments-history', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'index'])->name('payments.history');
+        Route::post('payments-history/{id}/mark-unpaid', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'markAsUnpaid'])->name('payments.history.mark_unpaid');
+    });
+
+    Route::middleware('permission:manage news')->group(function () {
+        Route::resource('elections', ElectionController::class);
+        Route::resource('candidates', CandidateController::class);
+    });
+
+    Route::middleware('permission:view students')->group(function () {
+        Route::resource('students', \App\Http\Controllers\Admin\StudentController::class);
+        Route::get('students/import', [\App\Http\Controllers\Admin\StudentImportController::class, 'index'])->name('students.import.index');
+        Route::post('students/import', [\App\Http\Controllers\Admin\StudentImportController::class, 'import'])->name('students.import.store');
+    });
 
     Route::prefix('promotion')->name('promotion.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\PromotionController::class, 'index'])->name('index');
-        Route::post('/process', [\App\Http\Controllers\Admin\PromotionController::class, 'process'])->name('process');
+        Route::middleware('permission:promote students')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\PromotionController::class, 'index'])->name('index');
+            Route::post('/process', [\App\Http\Controllers\Admin\PromotionController::class, 'process'])->name('process');
+        });
     });
 
-
-
-    // Payment Complaints Management
-    Route::prefix('payment-complaints')->name('payment.complaints.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'index'])->name('index');
-        Route::get('/{id}', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'show'])->name('show');
-        Route::post('/{id}/verify', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'verify'])->name('verify');
-        Route::post('/{id}/reject', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'reject'])->name('reject');
+    Route::middleware('permission:manage users')->group(function () {
+        Route::prefix('payment-complaints')->name('payment.complaints.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'index'])->name('index');
+            Route::get('/{id}', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'show'])->name('show');
+            Route::post('/{id}/verify', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'verify'])->name('payment.complaints.verify');
+            Route::post('/{id}/reject', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'reject'])->name('payment.complaints.reject');
+        });
     });
 
-    // Support Tickets
-    Route::prefix('support')->name('support.')->group(function () {
-        Route::get('/', [SupportTicketController::class, 'index'])->name('index');
-        Route::get('/{id}', [SupportTicketController::class, 'show'])->name('show');
-        Route::post('/{id}/status', [SupportTicketController::class, 'updateStatus'])->name('update_status');
+    Route::middleware('permission:manage users')->group(function () {
+        Route::prefix('support')->name('support.')->group(function () {
+            Route::get('/', [SupportTicketController::class, 'index'])->name('index');
+            Route::get('/{id}', [\App\Http\Controllers\Admin\SupportTicketController::class, 'show'])->name('show');
+            Route::post('/{id}/status', [SupportTicketController::class, 'updateStatus'])->name('update_status');
+        });
     });
 });
 

@@ -100,7 +100,7 @@
                     </button>
                     <div x-show="activeMenu === 'users'" x-cloak class="pl-10 space-y-1 mt-1">
                         <a href="{{ route('admin.users.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-slate-800' : '' }}">Users</a>
-                        <a href="{{ route('admin.roles.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.roles.*') ? 'bg-slate-800' : '' }}">Holes</a>
+                        <a href="{{ route('admin.roles.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.roles.*') ? 'bg-slate-800' : '' }}">Roles</a>
                     </div>
                 </div>
 
