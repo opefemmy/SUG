@@ -135,9 +135,9 @@ Route::prefix('student')->name('student.')->group(function () {
 Route::get('/student/receipts/download/{id}', [StudentReceiptController::class, 'download'])->name('receipt.download');
 
 // Receipt Verification Route
-Route::get('/verify/receipt/{payment_id}', function($payment_id) {
-    return "Verification for Receipt #$payment_id: This is a valid payment record in the SUG Portal system.";
-})->name('receipt.verify');
+Route::get('/verify/receipt/{payment_id}', [\App\Http\Controllers\Student\ReceiptVerificationController::class, 'verify'])->name('receipt.verify');
+
+
 
     // Impersonation / Unlock Routes
     Route::get('/unlock', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'showLogin'])->name('unlock.login');

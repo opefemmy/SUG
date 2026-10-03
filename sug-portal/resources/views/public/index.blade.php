@@ -47,6 +47,46 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
+        /* Flip Box Styles */
+        .flip-box {
+            perspective: 1000px;
+            height: 300px;
+        }
+        .flip-box-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .flip-box:hover .flip-box-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-box-front, .flip-box-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .flip-box-front {
+            background-color: white;
+            border: 1px solid #e5e7eb;
+        }
+        .flip-box-back {
+            background-color: #1e40af;
+            color: white;
+            transform: rotateY(180deg);
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-900">
@@ -158,6 +198,69 @@
             </header>
         @endif
     </div>
+
+    <!-- FLIP BOX SECTION -->
+    <section class="py-20 bg-white px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose Our Portal?</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Experience the most transparent and efficient way to manage your student union affairs.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Flip Box 1 -->
+                <div class="flip-box">
+                    <div class="flip-box-inner">
+                        <div class="flip-box-front">
+                            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-6">
+                                <i class="fas fa-bolt text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">Fast Payments</h3>
+                            <p class="text-gray-500 text-sm">Pay your dues in seconds using secure gateways.</p>
+                        </div>
+                        <div class="flip-box-back">
+                            <h3 class="text-xl font-bold mb-4">Instant Receipts</h3>
+                            <p class="text-blue-100 text-sm mb-6">No more queues. Get your official verified receipt instantly upon payment.</p>
+                            <a href="{{ route('login') }}" class="bg-white text-blue-700 px-4 py-2 rounded-full text-xs font-bold hover:bg-blue-50 transition">Pay Now</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Flip Box 2 -->
+                <div class="flip-box">
+                    <div class="flip-box-inner">
+                        <div class="flip-box-front">
+                            <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
+                                <i class="fas fa-shield-alt text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">Secure Voting</h3>
+                            <p class="text-gray-500 text-sm">Your vote is your voice, and we keep it safe.</p>
+                        </div>
+                        <div class="flip-box-back">
+                            <h3 class="text-xl font-bold mb-4">Absolute Privacy</h3>
+                            <p class="text-green-100 text-sm mb-6">End-to-end encrypted voting ensures your choice remains anonymous.</p>
+                            <a href="{{ route('login') }}" class="bg-white text-green-700 px-4 py-2 rounded-full text-xs font-bold hover:bg-green-50 transition">Vote Now</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Flip Box 3 -->
+                <div class="flip-box">
+                    <div class="flip-box-inner">
+                        <div class="flip-box-front">
+                            <div class="w-16 h-16 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-6">
+                                <i class="fas fa-info-circle text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold mb-2">Real-time News</h3>
+                            <p class="text-gray-500 text-sm">Stay updated with the latest campus events.</p>
+                        </div>
+                        <div class="flip-box-back">
+                            <h3 class="text-xl font-bold mb-4">Always Informed</h3>
+                            <p class="text-purple-100 text-sm mb-6">Get instant notifications on SUG activities and university policies.</p>
+                            <a href="{{ route('news') }}" class="bg-white text-purple-700 px-4 py-2 rounded-full text-xs font-bold hover:bg-purple-50 transition">Read News</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- FEATURE GRID -->
     <section class="py-20 px-4 max-w-7xl mx-auto">
