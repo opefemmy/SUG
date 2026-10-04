@@ -22,6 +22,20 @@ class Election extends Model
                now()->between($this->start_date, $this->end_date);
     }
 
+    public function isAccreditable(): bool
+    {
+        if ($this->status !== 'Open') {
+            return false;
+        }
+
+        if (!$this->accreditation_start || !$this->accreditation_end) {
+            // Fallback: if dates aren't set, allow accreditation anytime it's 'Open'
+            return true;
+        }
+
+        return now()->between($this->accreditation_start, $this->accreditation_end);
+    }
+
     public function positions(): HasMany
     {
         return $this->hasMany(ElectionPosition::class);

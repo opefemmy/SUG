@@ -30,8 +30,7 @@ class VotingController extends Controller
             return redirect()->route('student.dashboard')->with('error', 'The voting portal is currently closed.');
         }
 
-        // Show all elections that are 'Open', regardless of whether they are live yet.
-        // This allows students to see elections and perform accreditation.
+        // Show all elections that are 'Open'
         $elections = Election::where('status', 'Open')->get();
 
         $view = Auth::user()->hasRole('admin')
@@ -85,9 +84,9 @@ class VotingController extends Controller
             return redirect()->route('student.dashboard')->with('error', 'The voting portal is currently closed.');
         }
 
-        // Ensure the election is in a state where accreditation is allowed ('Open')
-        if ($election->status !== 'Open') {
-            return redirect()->route('student.elections.index')->with('error', 'This election is not open for accreditation.');
+        // Ensure the election is in a state where accreditation is allowed
+        if (!$election->isAccreditable()) {
+            return redirect()->route('student.elections.index')->with('error', 'Accreditation for this election is currently closed.');
         }
 
         $student = Auth::user()->student;

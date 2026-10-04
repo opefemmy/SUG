@@ -53,16 +53,34 @@
                     @error('status') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                    <input type="datetime-local" name="start_date" value="{{ old('start_date', $election->start_date ?? '') }}" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                    @error('start_date') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                <div class="md:col-span-2 border-t pt-6 mt-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Accreditation Window</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Accreditation Start Date</label>
+                            <input type="datetime-local" name="accreditation_start" value="{{ old('accreditation_start', $election->accreditation_start ?? '') }}" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Accreditation End Date</label>
+                            <input type="datetime-local" name="accreditation_end" value="{{ old('accreditation_end', $election->accreditation_end ?? '') }}" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                    <input type="datetime-local" name="end_date" value="{{ old('end_date', $election->end_date ?? '') }}" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                    @error('end_date') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                <div class="md:col-span-2 border-t pt-6 mt-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Voting Window</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Voting Start Date</label>
+                            <input type="datetime-local" name="start_date" value="{{ old('start_date', $election->start_date ?? '') }}" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                            @error('start_date') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Voting End Date</label>
+                            <input type="datetime-local" name="end_date" value="{{ old('end_date', $election->end_date ?? '') }}" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                            @error('end_date') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
                 </div>
             </div>
 
