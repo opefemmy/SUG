@@ -236,6 +236,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('elections', ElectionController::class);
         Route::post('elections/toggle-voting', [ \App\Http\Controllers\Admin\ElectionSettingsController::class, 'toggleVoting'])->name('elections.toggle_voting');
         Route::resource('candidates', CandidateController::class);
+
+        // Election Positions Routes
+        Route::prefix('elections/{election}')->name('elections.positions.')->group(function () {
+            Route::get('/positions/create', [\App\Http\Controllers\Admin\ElectionPositionController::class, 'create'])->name('create');
+            Route::post('/positions', [\App\Http\Controllers\Admin\ElectionPositionController::class, 'store'])->name('store');
+        });
     });
 
     Route::middleware('permission:view students')->group(function () {

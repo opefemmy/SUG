@@ -53,7 +53,7 @@
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-bold text-gray-800">Positions & Candidates</h3>
                     <div class="flex gap-2">
-                        <a href="{{ route('admin.election-positions.create', $election->id) }}" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 transition flex items-center gap-1">
+                        <a href="{{ route('admin.elections.positions.create', $election->id) }}" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 transition flex items-center gap-1">
                             <i class="fas fa-plus"></i> Add Position
                         </a>
                         <a href="{{ route('admin.candidates.index', ['election_id' => $election->id]) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-bold flex items-center gap-1">

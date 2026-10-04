@@ -2,6 +2,27 @@
 
 @section('content')
 <div class="space-y-8">
+    @if(\App\Services\SettingsService::get('voting_enabled') && \App\Models\Election::where('status', 'Open')->exists())
+    <div class="bg-orange-50 border-l-4 border-orange-500 p-6 rounded-r-2xl shadow-sm">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="p-3 bg-orange-100 text-orange-600 rounded-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-orange-800">Live Election Ongoing!</h3>
+                    <p class="text-orange-700 text-sm">Your vote counts. Participate in the current campus elections now.</p>
+                </div>
+            </div>
+            <a href="{{ route('student.elections.index') }}" class="bg-orange-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-orange-700 transition shadow-sm">
+                Vote Now
+            </a>
+        </div>
+    </div>
+    @endif
+
     <!-- Welcome Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
