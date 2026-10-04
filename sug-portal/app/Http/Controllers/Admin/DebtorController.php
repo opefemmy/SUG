@@ -11,45 +11,96 @@ use Illuminate\Support\Facades\DB;
 
 class DebtorController extends Controller
 {
-    public function index()
+    protected function getDebtorsQuery(Request $request)
     {
-        // Use a subquery to calculate totals for each student to avoid N+1 problem
-        // and filter for only those with an outstanding balance.
-
-        $debtors = Student::query()
+        $query = Student::query()
             ->join('users', 'students.user_id', '=', 'users.id')
             ->join('departments', 'students.department_id', '=', 'departments.id')
+            ->join('programmes', 'students.programme_id', '=', 'programmes.id')
             ->select([
                 'students.id',
                 'users.name',
                 'students.matric_no',
                 'departments.name as department_name',
+                'programmes.name as programme_name',
                 DB::raw("(
-                    SELECT SUM(amount)
+                    SELECT COALESCE(SUM(amount), 0)
                     FROM fee_structures
                     WHERE session_id = students.session_id
                     AND (level_id = students.current_level_id OR level_id IS NULL)
                     AND (programme_id = students.programme_id OR programme_id IS NULL)
                 ) as total_required"),
                 DB::raw("(
-                    SELECT SUM(amount)
+                    SELECT COALESCE(SUM(amount), 0)
                     FROM payments
                     WHERE student_id = students.id
                     AND status IN ('success', 'successful', 'completed')
                 ) as total_paid")
             ])
             ->where(function($query) {
-                $query->whereRaw('(SELECT SUM(amount) FROM fee_structures WHERE session_id = students.session_id AND (level_id = students.current_level_id OR level_id IS NULL) AND (programme_id = students.programme_id OR programme_id IS NULL)) >
-                (SELECT SUM(amount) FROM payments WHERE student_id = students.id AND status IN (\'success\', \'successful\', \'completed\'))');
-            })
-            ->paginate(15);
+                $query->whereRaw('(SELECT COALESCE(SUM(amount), 0) FROM fee_structures WHERE session_id = students.session_id AND (level_id = students.current_level_id OR level_id IS NULL) AND (programme_id = students.programme_id OR programme_id IS NULL)) >
+                (SELECT COALESCE(SUM(amount), 0) FROM payments WHERE student_id = students.id AND status IN (\'success\', \'successful\', \'completed\'))');
+            });
 
-        // Calculate outstanding balance for each debtor in the collection
+        if ($request->filled('school_id')) {
+            $query->where('students.school_id', $request->school_id);
+        }
+
+        if ($request->filled('programme_id')) {
+            $query->where('students.programme_id', $request->programme_id);
+        }
+
+        return $query;
+    }
+
+    public function index(Request $request)
+    {
+        $debtors = $this->getDebtorsQuery($request)->paginate(15);
+
         $debtors->getCollection()->transform(function ($debtor) {
             $debtor->outstanding_balance = max(0, ($debtor->total_required ?? 0) - ($debtor->total_paid ?? 0));
             return $debtor;
         });
 
-        return view('admin.debtors.index', compact('debtors'));
+        $schools = \App\Models\School::orderBy('name')->get();
+        $programmes = \App\Models\Programme::orderBy('name')->get();
+
+        return view('admin.debtors.index', compact('debtors', 'schools', 'programmes'));
+    }
+
+    public function export(Request $request)
+    {
+        $fileName = 'debtors_list_' . now()->format('YmdHis') . '.csv';
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, ran-expire",
+            "Expires"             => "0"
+        ];
+
+        $callback = function() use ($request) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['Student Name', 'Matric No', 'Department', 'Programme', 'Total Required', 'Total Paid', 'Outstanding Balance']);
+
+            $this->getDebtorsQuery($request)->chunk(100, function ($debtors) use ($file) {
+                foreach ($debtors as $debtor) {
+                    $outstanding = max(0, ($debtor->total_required ?? 0) - ($debtor->total_paid ?? 0));
+                    fputcsv($file, [
+                        $debtor->name,
+                        $debtor->matric_no,
+                        $debtor->department_name,
+                        $debtor->programme_name,
+                        number_format($debtor->total_required, 2),
+                        number_format($debtor->total_paid, 2),
+                        number_format($outstanding, 2),
+                    ]);
+                }
+            });
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

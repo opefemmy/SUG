@@ -161,7 +161,7 @@
         </div>
     </div>
 
-    @if(\App\Models\Election::where('status', 'Open')->exists())
+    @if(\App\Services\SettingsService::get('voting_enabled') && \App\Models\Election::where('status', 'Open')->exists())
     <div class="bg-orange-50 border-l-4 border-orange-500 p-6 rounded-r-2xl shadow-sm">
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">

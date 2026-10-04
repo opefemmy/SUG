@@ -11,10 +11,10 @@ class PaymentHistoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Payment::with(['student.user', 'receipt']);
+        $query = Payment::with(['student.user', 'student.department', 'student.programme', 'receipt']);
 
         // Filter by student email if provided
-        if ($request->has('email')) {
+        if ($request->filled('email')) {
             $query->whereHas('student', function($q) use ($request) {
                 $q->whereHas('user', function($uq) use ($request) {
                     $uq->where('email', 'like', '%' . $request->email . '%');
@@ -22,9 +22,83 @@ class PaymentHistoryController extends Controller
             });
         }
 
+        // Filter by school if provided
+        if ($request->filled('school_id')) {
+            $query->whereHas('student', function($q) use ($request) {
+                $q->where('school_id', $request->school_id);
+            });
+        }
+
+        // Filter by department if provided
+        if ($request->filled('department_id')) {
+            $query->whereHas('student', function($q) use ($request) {
+                $q->where('department_id', $request->department_id);
+            });
+        }
+
         $payments = $query->latest()->paginate(20);
 
-        return view('admin.payments.history', compact('payments'));
+        $schools = \App\Models\School::orderBy('name')->get();
+        $departments = \App\Models\Department::orderBy('name')->get();
+
+        return view('admin.payments.history', compact('payments', 'schools', 'departments'));
+    }
+
+    public function export(Request $request)
+    {
+        $fileName = 'payment_history_' . now()->format('YmdHis') . '.csv';
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, ran-expire",
+            "Expires"             => "0"
+        ];
+
+        $callback = function() use ($request) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['Receipt No', 'Student Name', 'Department', 'Programme', 'Amount', 'Status', 'Date']);
+
+            $query = Payment::with(['student.user', 'student.department', 'student.programme', 'receipt']);
+
+            if ($request->filled('email')) {
+                $query->whereHas('student', function($q) use ($request) {
+                    $q->whereHas('user', function($uq) use ($request) {
+                        $uq->where('email', 'like', '%' . $request->email . '%');
+                    });
+                });
+            }
+
+            if ($request->filled('school_id')) {
+                $query->whereHas('student', function($q) use ($request) {
+                    $q->where('school_id', $request->school_id);
+                });
+            }
+
+            if ($request->filled('department_id')) {
+                $query->whereHas('student', function($q) use ($request) {
+                    $q->where('department_id', $request->department_id);
+                });
+            }
+
+            $query->latest()->chunk(100, function ($payments) use ($file) {
+                foreach ($payments as $payment) {
+                    fputcsv($file, [
+                        $payment->receipt->receipt_no ?? 'N/A',
+                        $payment->student->user->name ?? 'Unknown',
+                        $payment->student->department->name ?? 'N/A',
+                        $payment->student->programme->name ?? 'N/A',
+                        number_format($payment->amount, 2),
+                        $payment->status,
+                        $payment->created_at->format('Y-m-d H:i:s'),
+                    ]);
+                }
+            });
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**

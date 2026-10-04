@@ -119,6 +119,9 @@ Route::prefix('student')->name('student.')->group(function () {
 
     // Elections
     Route::get('/elections', [StudentVotingController::class, 'index'])->name('elections.index');
+    Route::get('/elections/show/{election}', [StudentVotingController::class, 'show'])->name('elections.show');
+    Route::get('/elections/accredit/{election}', [StudentVotingController::class, 'accredit'])->name('elections.accredit');
+    Route::post('/elections/vote/{election}', [StudentVotingController::class, 'store'])->name('elections.vote');
 
     // Support
     Route::get('/support', [StudentSupportController::class, 'index'])->name('support.index');
@@ -127,7 +130,7 @@ Route::prefix('student')->name('student.')->group(function () {
     // Payment Complaints
     Route::get('/payment-complaints', [\App\Http\Controllers\Student\PaymentComplaintController::class, 'index'])->name('complaints.index');
     Route::get('/payment-complaints/create', [\App\Http\Controllers\Student\PaymentComplaintController::class, 'create'])->name('complaints.create');
-    Route::post('/payment-complaints', [\App\Http\Controllers\Student\PaymentComplaintController::class, 'store'])->name('complaints.store');
+    Route::post('/payment-complations', [\App\Http\Controllers\Student\PaymentComplaintController::class, 'store'])->name('complaints.store');
 });
 
 // Defining receipt.download outside the student. prefix group to match the view's route('receipt.download')
@@ -138,7 +141,7 @@ Route::get('/verify/receipt/{payment_id}', [\App\Http\Controllers\Student\Receip
 
 // Impersonation / Unlock Routes
 Route::get('/unlock', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'showLogin'])->name('unlock.login');
-Route::post('/unlock/auth', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'authenticate'])->name('unlock.auth');
+Route::post('/unlock/auth', [ \App\H\Controllers\Admin\ImpersonationController::class, 'authenticate'])->name('unlock.auth');
 
 Route::middleware([\App\Http\Middleware\EnsureIsMasterAdmin::class])->group(function () {
     Route::get('/unlock/dashboard', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'index'])->name('unlock.dashboard');
@@ -217,6 +220,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
     Route::middleware('permission:view payments')->group(function () {
         Route::get('debtors', [\App\Http\Controllers\Admin\DebtorController::class, 'index'])->name('debtors.index');
+        Route::get('debtors/export', [\App\Http\Controllers\Admin\DebtorController::class, 'export'])->name('debtors.export');
     });
     Route::middleware('permission:view payments')->group(function () {
         Route::get('payments-config', [\App\Http\Controllers\Admin\PaymentConfigController::class, 'index'])->name('payments.config.index');
@@ -224,11 +228,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
     Route::middleware('permission:view payments')->group(function () {
         Route::get('payments-history', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'index'])->name('payments.history');
+        Route::get('payments-history/export', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'export'])->name('payments.history.export');
         Route::post('payments-history/{id}/mark-unpaid', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'markAsUnpaid'])->name('payments.history.mark_unpaid');
     });
 
     Route::middleware('permission:manage news')->group(function () {
         Route::resource('elections', ElectionController::class);
+        Route::post('elections/toggle-voting', [ \App\Http\Controllers\Admin\ElectionSettingsController::class, 'toggleVoting'])->name('admin.elections.toggle_voting');
         Route::resource('candidates', CandidateController::class);
     });
 
@@ -248,7 +254,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('permission:manage users')->group(function () {
         Route::prefix('payment-complaints')->name('payment.complaints.')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'index'])->name('index');
-            Route::get('/{id}', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'show'])->name('show');
+            Route::get('/{id}', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'show'])->name('complaints.show');
             Route::post('/{id}/verify', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'verify'])->name('payment.complaints.verify');
             Route::post('/{id}/reject', [\App\Http\Controllers\Admin\PaymentComplaintController::class, 'reject'])->name('payment.complaints.reject');
         });
@@ -257,7 +263,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('permission:manage users')->group(function () {
         Route::prefix('support')->name('support.')->group(function () {
             Route::get('/', [SupportTicketController::class, 'index'])->name('index');
-            Route::get('/{id}', [\App\Http\Controllers\Admin\SupportTicketController::class, 'show'])->name('show');
+            Route::get('/{id}', [SupportTicketController::class, 'show'])->name('show');
             Route::post('/{id}/status', [SupportTicketController::class, 'updateStatus'])->name('update_status');
         });
     });

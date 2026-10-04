@@ -9,6 +9,7 @@ use App\Models\ElectionPosition;
 use App\Models\Candidate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\VoterEligibility;
 
 class VotingController extends Controller
 {
@@ -24,6 +25,11 @@ class VotingController extends Controller
      */
     public function index()
     {
+        // Only show if voting is enabled in settings
+        if (!\App\Services\SettingsService::get('voting_enabled')) {
+            return view('student.elections.disabled');
+        }
+
         $elections = Election::where('status', 'Open')
             ->get()
             ->filter(function($election) {
@@ -42,15 +48,26 @@ class VotingController extends Controller
      */
     public function show(Election $election)
     {
+        // Only show if voting is enabled globally
+        if (!\App\Services\SettingsService::get('voting_enabled')) {
+            return redirect()->route('student.dashboard')->with('error', 'Voting is currently disabled by the administrator.');
+        }
+
         // Only show if election is live
         if (!$election->isLive()) {
             return redirect()->route('student.dashboard')->with('error', 'This election is not currently open.');
         }
 
-        // Check if student has already voted for any position in this election
+        // Accreditation check
         $student = Auth::user()->student;
-        // Since we use voter_hash, we can't easily query "did this user vote" without the hash.
-        // However, the VotingService handles this. We can notify the user in the store method.
+        $eligibility = VoterEligibility::where('election_id', $election->id)
+            ->where('student_id', $student->id)
+            ->first();
+
+        if (!$eligibility || !$eligibility->is_accredited) {
+            return redirect()->route('student.elections.accredit', ['election' => $election->id])
+                ->with('info', 'You must be accredited before you can cast your vote.');
+        }
 
         // Load positions and their approved candidates
         $positions = ElectionPosition::where('election_id', $election->id)
@@ -60,6 +77,19 @@ class VotingController extends Controller
             ->get();
 
         return view('student.elections.vote', compact('election', 'positions'));
+    }
+
+    public function accredit(Election $election)
+    {
+        $student = Auth::user()->student;
+
+        $eligibility = VoterEligibility::updateOrCreate(
+            ['election_id' => $election->id, 'student_id' => $student->id],
+            ['is_accredited' => true]
+        );
+
+        return redirect()->route('student.elections.show', $election->id)
+            ->with('success', 'You have been successfully accredited for this election!');
     }
 
     /**
@@ -72,7 +102,16 @@ class VotingController extends Controller
             'votes.*' => 'required|integer|exists:candidates,id',
         ]);
 
-        $student = Auth::user()->student; // Assuming User has a student relationship
+        $student = Auth::user()->student;
+
+        // Final safety check for accreditation
+        $eligibility = VoterEligibility::where('election_id', $election->id)
+            ->where('student_id', $student->id)
+            ->first();
+
+        if (!$eligibility || !$eligibility->is_accredited) {
+            return back()->withErrors(['error' => 'You must be accredited before voting.']);
+        }
 
         try {
             foreach ($request->votes as $positionId => $candidateId) {

@@ -8,16 +8,51 @@
     </div>
 
     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
-        <form action="{{ route('admin.payments.history') }}" method="GET" class="flex flex-col md:flex-row gap-4">
-            <div class="flex-1">
+        <form action="{{ route('admin.payments.history') }}" method="GET" class="flex flex-wrap gap-4 items-end">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Student Email</label>
                 <input type="text" name="email" value="{{ request('email') }}" placeholder="Search student by email..." class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
-                Search
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1">School</label>
+                <select name="school_id" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="">All Schools</option>
+                    @foreach($schools as $school)
+                        <option value="{{ $school->id }}" {{ request('school_id') == $school->id ? 'selected' : '' }}>{{ $school->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                <select name="department_id" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="">All Departments</option>
+                    @foreach($departments as $department)
+                        <option value="{{ $department->id }}" {{ request('department_id') == $department->id ? 'selected' : '' }}>{{ $department->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
+                    Search
+                </button>
+                <a href="{{ route('admin.payments.history') }}" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-bold hover:bg-gray-300 transition text-center">
+                    Reset
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="flex justify-end mb-4">
+        <form action="{{ route('admin.payments.history.export') }}" method="GET" class="flex gap-2">
+            <input type="hidden" name="email" value="{{ request('email') }}">
+            <input type="hidden" name="school_id" value="{{ request('school_id') }}">
+            <input type="hidden" name="department_id" value="{{ request('department_id') }}">
+            <button type="submit" class="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm font-medium shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Export to CSV (Excel)
             </button>
-            <a href="{{ route('admin.payments.history') }}" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-bold hover:bg-gray-300 transition text-center">
-                Reset
-            </a>
         </form>
     </div>
 
@@ -27,6 +62,8 @@
                 <tr class="text-gray-700">
                     <th class="p-4 font-bold border-b">Receipt No</th>
                     <th class="p-4 font-bold border-b">Student</th>
+                    <th class="p-4 font-bold border-b">Department</th>
+                    <th class="p-4 font-bold border-b">Programme</th>
                     <th class="p-4 font-bold border-b">Amount</th>
                     <th class="p-4 font-bold border-b">Status</th>
                     <th class="p-4 font-bold border-b">Date</th>
@@ -41,6 +78,8 @@
                             <div class="font-medium">{{ $payment->student->user->name ?? 'Unknown' }}</div>
                             <div class="text-xs text-gray-500">{{ $payment->student->user->email ?? 'N/A' }}</div>
                         </td>
+                        <td class="p-4 text-sm text-gray-600">{{ $payment->student->department->name ?? 'N/A' }}</td>
+                        <td class="p-4 text-sm text-gray-600">{{ $payment->student->programme->name ?? 'N/A' }}</td>
                         <td class="p-4 font-bold">₦{{ number_format($payment->amount, 2) }}</td>
                         <td class="p-4">
                             <span class="px-2 py-1 rounded-full text-xs font-bold {{ $payment->status === 'success' ? 'bg-green-100 text-green-700' : ($payment->status === 'initiated' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700') }}">
@@ -65,7 +104,7 @@
                 @empty
 
                     <tr>
-                        <td colspan="5" class="p-8 text-center text-gray-500">No payments found.</td>
+                        <td colspan="8" class="p-8 text-center text-gray-500">No payments found.</td>
                     </tr>
                 @endforelse
             </tbody>

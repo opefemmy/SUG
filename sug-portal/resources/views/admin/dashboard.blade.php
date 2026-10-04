@@ -6,8 +6,8 @@
         <p class="text-gray-600">Welcome back, {{ Auth::user()->name ?? 'Admin' }}. Here is an overview of the SUG portal.</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+    <div class="flex flex-wrap gap-6 mb-10">
+        <div class="flex-1 min-w-[300px] bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div class="flex items-center justify-between mb-4">
                 <div class="p-2 bg-blue-100 text-blue-600 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -16,11 +16,11 @@
                 </div>
                 <span class="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">Live</span>
             </div>
-            <div class="text-2xl font-bold text-gray-800">{{ \App\Models\User::count() }} Users</div>
+            <div class="text-2xl font-bold text-gray-800">{{ $stats['total_users'] }} Users</div>
             <div class="text-sm text-gray-500">Total registered users in the system</div>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div class="flex-1 min-w-[300px] bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div class="flex items-center justify-between mb-4">
                 <div class="p-2 bg-green-100 text-green-600 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -30,11 +30,11 @@
                 </div>
                 <span class="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Revenue</span>
             </div>
-            <div class="text-2xl font-bold text-gray-800">₦{{ number_format(\App\Models\Payment::whereIn('status', ['success', 'successful', 'completed'])->sum('amount'), 2) }}</div>
+            <div class="text-2xl font-bold text-gray-800">₦{{ number_format($stats['total_revenue'], 2) }}</div>
             <div class="text-sm text-gray-500">Total revenue from successful payments</div>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div class="flex-1 min-w-[300px] bg-white p-6 rounded-xl shadow-sm border border-gray-200">
             <div class="flex items-center justify-between mb-4">
                 <div class="p-2 bg-yellow-100 text-yellow-600 rounded-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -43,7 +43,7 @@
                 </div>
                 <span class="text-xs font-medium text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full">Transactions</span>
             </div>
-            <div class="text-2xl font-bold text-gray-800">{{ \App\Models\Payment::whereIn('status', ['success', 'successful', 'completed'])->count() }}</div>
+            <div class="text-2xl font-bold text-gray-800">{{ $stats['total_transactions'] }}</div>
             <div class="text-sm text-gray-500">Total successful transactions</div>
         </div>
     </div>
