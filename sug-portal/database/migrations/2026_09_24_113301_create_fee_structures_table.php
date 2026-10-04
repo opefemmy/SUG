@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('fee_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('programme_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('level_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('session_id')->constrained()->onDelete('cascade');
+            $table->foreignId('session_id')->constrained('academic_sessions')->onDelete('cascade');
             $table->decimal('amount', 12, 2);
             $table->boolean('is_mandatory')->default(true);
             $table->timestamps();

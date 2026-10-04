@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('levels', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('programme_id')->constrained()->onDelete('cascade');
+            $table->foreignId('programme_id')->nullable()->constrained()->onDelete('cascade');
             $table->integer('level_number');
             $table->timestamps();
         });

@@ -23,6 +23,8 @@ use App\Http\Controllers\Admin\SettingController as AdminSettingController;
 use App\Services\SettingsService;
 use App\Http\Controllers\Admin\SupportTicketController;
 
+Route::get('/up', fn () => response('OK', 200))->name('health');
+
 Route::get('/', function() {
     return view('public.index', [
         'news' => \App\Models\News::with('category')->latest()->take(3)->get(),
