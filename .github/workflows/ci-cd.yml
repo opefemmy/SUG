@@ -35,19 +35,21 @@ jobs:
           cache: npm
           cache-dependency-path: sug-portal/package-lock.json
 
+      - name: Prepare test environment
+        run: |
+          cp .env.example .env
+
       - name: Install PHP dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress --no-scripts
+          php artisan key:generate
+          php artisan package:discover --ansi
 
       - name: Install frontend dependencies
         run: npm ci
 
       - name: Build frontend
         run: npm run build
-
-      - name: Prepare test environment
-        run: |
-          cp .env.example .env
-          php artisan key:generate
 
       - name: Run migrations and tests
         run: |
@@ -83,7 +85,7 @@ jobs:
 
       - name: Build production release
         run: |
-          composer install --no-dev --no-interaction --prefer-dist --no-progress --optimize-autoloader
+          composer install --no-dev --no-interaction --prefer-dist --no-progress --no-scripts --optimize-autoloader
           npm ci
           npm run build
           tar -czf "$RUNNER_TEMP/sug-portal-${GITHUB_SHA}.tar.gz" \
