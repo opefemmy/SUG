@@ -88,7 +88,7 @@
                     </a>
                 </div>
                 <div class="mt-6 pt-4 border-t border-gray-100 text-center text-xs text-gray-400">
-                    &copy; 2026 EKSCOTECH SUG PORTAL Portal. All rights reserved. <br>
+                    &copy; 2026 EKSCOTECH SUG PORTAL. All rights reserved. <br>
                     Powered by the Directorate of ICT
                 </div>
             </div>

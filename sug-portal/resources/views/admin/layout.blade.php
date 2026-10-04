@@ -207,7 +207,7 @@
                 @yield('content')
 
                 <footer class="py-6 text-center text-xs text-gray-500 border-t border-gray-200">
-                    &copy; 2026 EKSCOTECH SUG PORTAL Portal. All rights reserved. <br>
+                    &copy; 2026 EKSCOTECH SUG PORTAL. All rights reserved. <br>
                     Powered by the Directorate of ICT
                 </footer>
             </div>

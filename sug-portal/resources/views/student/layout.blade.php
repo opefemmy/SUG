@@ -215,7 +215,7 @@
         </div>
     </div>
     <footer class="absolute bottom-0 left-0 w-full py-4 text-center text-xs text-gray-500 bg-white border-t border-gray-200">
-        &copy; 2026 EKSCOTECH SUG PORTAL Portal. All rights reserved. <br>
+        &copy; 2026 EKSCOTECH SUG PORTAL. All rights reserved. <br>
         Powered by the Directorate of ICT
     </footer>
         </main>

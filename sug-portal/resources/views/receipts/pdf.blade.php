@@ -276,7 +276,7 @@
                 <div style="clear: both;"></div>
             </div>
             <div class="footer">
-                &copy; 2026 EKSCOTECH SUG PORTAL Portal. All rights reserved. <br>
+                &copy; 2026 EKSCOTECH SUG PORTAL. All rights reserved. <br>
                 Powered by the Directorate of ICT
             </div>
         </div>

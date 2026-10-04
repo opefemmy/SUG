@@ -66,7 +66,7 @@
     </div>
 
     <footer class="absolute bottom-4 w-full text-center text-xs text-gray-600 font-medium drop-shadow-sm">
-        &copy; 2026 EKSCOTECH SUG PORTAL Portal. All rights reserved. <br>
+        &copy; 2026 EKSCOTECH SUG PORTAL. All rights reserved. <br>
         Powered by the Directorate of ICT
     </footer>
 </body>
