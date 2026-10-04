@@ -25,16 +25,14 @@ class VotingController extends Controller
      */
     public function index()
     {
-        // Only show if voting is enabled in settings
+        // Global Kill Switch: If voting is disabled in settings, block everything
         if (!\App\Services\SettingsService::get('voting_enabled')) {
-            return view('student.elections.disabled');
+            return redirect()->route('student.dashboard')->with('error', 'The voting portal is currently closed.');
         }
 
-        $elections = Election::where('status', 'Open')
-            ->get()
-            ->filter(function($election) {
-                return $election->isLive();
-            });
+        // Show all elections that are 'Open', regardless of whether they are live yet.
+        // This allows students to see elections and perform accreditation.
+        $elections = Election::where('status', 'Open')->get();
 
         $view = Auth::user()->hasRole('admin')
             ? 'admin.elections.index'
@@ -48,14 +46,15 @@ class VotingController extends Controller
      */
     public function show(Election $election)
     {
-        // Only show if voting is enabled globally
+        // Global Kill Switch
         if (!\App\Services\SettingsService::get('voting_enabled')) {
             return redirect()->route('student.dashboard')->with('error', 'Voting is currently disabled by the administrator.');
         }
 
-        // Only show if election is live
+        // Check if the election is actually live for voting
         if (!$election->isLive()) {
-            return redirect()->route('student.dashboard')->with('error', 'This election is not currently open.');
+            return redirect()->route('student.elections.index')
+                ->with('info', 'Accreditation is open, but voting for this election has not yet commenced.');
         }
 
         // Accreditation check
@@ -81,6 +80,16 @@ class VotingController extends Controller
 
     public function accredit(Election $election)
     {
+        // Global Kill Switch
+        if (!\App\Services\SettingsService::get('voting_enabled')) {
+            return redirect()->route('student.dashboard')->with('error', 'The voting portal is currently closed.');
+        }
+
+        // Ensure the election is in a state where accreditation is allowed ('Open')
+        if ($election->status !== 'Open') {
+            return redirect()->route('student.elections.index')->with('error', 'This election is not open for accreditation.');
+        }
+
         $student = Auth::user()->student;
 
         $eligibility = VoterEligibility::updateOrCreate(
@@ -97,6 +106,16 @@ class VotingController extends Controller
      */
     public function store(Request $request, Election $election)
     {
+        // Global Kill Switch
+        if (!\App\Services\SettingsService::get('voting_enabled')) {
+            return redirect()->route('student.dashboard')->with('error', 'The voting portal is currently closed.');
+        }
+
+        // Ensure the election is live for voting
+        if (!$election->isLive()) {
+            return redirect()->route('student.elections.index')->with('error', 'Voting for this election is not currently live.');
+        }
+
         $request->validate([
             'votes' => 'required|array',
             'votes.*' => 'required|integer|exists:candidates,id',

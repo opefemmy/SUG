@@ -21,7 +21,7 @@ class SettingsService
     /**
      * Set a setting value.
      */
-    public function set(string $key, $value, string $group = 'general'): void
+    public static function set(string $key, $value, string $group = 'general'): void
     {
         Setting::updateOrCreate(
             ['key' => $key],

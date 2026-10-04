@@ -141,7 +141,7 @@ Route::get('/verify/receipt/{payment_id}', [\App\Http\Controllers\Student\Receip
 
 // Impersonation / Unlock Routes
 Route::get('/unlock', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'showLogin'])->name('unlock.login');
-Route::post('/unlock/auth', [ \App\H\Controllers\Admin\ImpersonationController::class, 'authenticate'])->name('unlock.auth');
+Route::post('/unlock/auth', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'authenticate'])->name('unlock.auth');
 
 Route::middleware([\App\Http\Middleware\EnsureIsMasterAdmin::class])->group(function () {
     Route::get('/unlock/dashboard', [ \App\Http\Controllers\Admin\ImpersonationController::class, 'index'])->name('unlock.dashboard');
@@ -234,7 +234,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::middleware('permission:manage news')->group(function () {
         Route::resource('elections', ElectionController::class);
-        Route::post('elections/toggle-voting', [ \App\Http\Controllers\Admin\ElectionSettingsController::class, 'toggleVoting'])->name('admin.elections.toggle_voting');
+        Route::post('elections/toggle-voting', [ \App\Http\Controllers\Admin\ElectionSettingsController::class, 'toggleVoting'])->name('elections.toggle_voting');
         Route::resource('candidates', CandidateController::class);
     });
 
