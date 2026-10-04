@@ -45,4 +45,9 @@ class Election extends Model
     {
         return $this->hasMany(Candidate::class);
     }
+
+    public function session()
+    {
+        return $this->belongsTo(AcademicSession::class, 'session_id');
+    }
 }
