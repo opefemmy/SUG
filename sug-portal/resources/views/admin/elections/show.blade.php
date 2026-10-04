@@ -38,7 +38,16 @@
                         <label class="text-xs text-gray-500 uppercase font-bold">Timeline</label>
                         <p class="text-sm text-gray-800">Start: {{ $election->start_date }}</p>
                         <p class="text-sm text-gray-800">End: {{ $election->end_date }}</p>
+                        @if($election->accreditation_start)
+                            <p class="text-xs text-gray-600 italic">Accreditation: {{ $election->accreditation_start }} to {{ $election->accreditation_end }}</p>
+                        @endif
                     </div>
+                    <div class="pt-4">
+                        <a href="{{ route('admin.elections.unaccredited', $election->id) }}" class="w-full text-center bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-700 transition flex items-center justify-center gap-2">
+                            <i class="fas fa-file-download"></i> Export Unaccredited Students
+                        </a>
+                    </div>
+
                     <div>
                         <label class="text-xs text-gray-500 uppercase font-bold">Description</label>
                         <p class="text-sm text-gray-600">{{ $election->description ?? 'No description provided.' }}</p>
