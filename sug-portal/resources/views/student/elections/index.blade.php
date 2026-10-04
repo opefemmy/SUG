@@ -14,14 +14,25 @@
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group">
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-4">
-                        <span class="px-3 py-1 bg-green-100 text-green-600 text-xs font-bold rounded-full uppercase">Live Now</span>
+                        @if($election->isLive())
+                            <span class="px-3 py-1 bg-green-100 text-green-600 text-xs font-bold rounded-full uppercase">Voting Live</span>
+                        @else
+                            <span class="px-3 py-1 bg-blue-100 text-blue-600 text-xs font-bold rounded-full uppercase">Accreditation Phase</span>
+                        @endif
                         <span class="text-xs text-gray-400">Ends: {{ \Carbon\Carbon::parse($election->end_date)->format('M d, h:i A') }}</span>
                     </div>
                     <h3 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-indigo-600 transition">{{ $election->name }}</h3>
                     <p class="text-gray-600 text-sm mb-6 line-clamp-2">{{ $election->description }}</p>
-                    <a href="{{ route('student.elections.vote', $election->id) }}" class="block w-full text-center bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-sm">
-                        Cast Your Vote
-                    </a>
+
+                    @if($election->isLive())
+                        <a href="{{ route('student.elections.show', $election->id) }}" class="block w-full text-center bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-sm">
+                            Cast Your Vote
+                        </a>
+                    @else
+                        <a href="{{ route('student.elections.accredit', $election->id) }}" class="block w-full text-center bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-sm">
+                            Accredit Me Now
+                        </a>
+                    @endif
                 </div>
             </div>
         @empty

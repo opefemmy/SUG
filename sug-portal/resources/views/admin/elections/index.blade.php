@@ -5,6 +5,9 @@
     <div class="flex items-center justify-between">
         <h1 class="text-2xl font-bold text-gray-800">Manage Elections</h1>
         <div class="flex gap-2">
+            <a href="{{ route('admin.elections.create') }}" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-bold flex items-center gap-1">
+                <i class="fas fa-plus"></i> Create Election
+            </a>
             <a href="{{ route('student.elections.index') }}" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-xs font-bold border border-gray-300 flex items-center gap-1">
                 <i class="fas fa-eye"></i> View Live Portal
             </a>
