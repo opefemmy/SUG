@@ -81,6 +81,12 @@
                     <div x-show="activeMenu === 'election'" x-cloak class="pl-10 space-y-1 mt-1">
                         <a href="{{ route('admin.elections.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.elections.*') ? 'bg-slate-800' : '' }}">Manage Elections</a>
                         <a href="{{ route('admin.candidates.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.candidates.*') ? 'bg-slate-800' : '' }}">Manage Candidates</a>
+                        <form action="{{ route('admin.elections.toggle_voting') }}" method="POST" class="block p-2 text-sm">
+                            @csrf
+                            <button type="submit" class="w-full text-left block p-0 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('admin.elections.toggle_voting') ? 'bg-slate-800' : '' }} text-white">
+                                {{ \App\Services\SettingsService::get('voting_enabled') ? 'Disable Voting' : 'Enable Voting' }}
+                            </button>
+                        </form>
                         <a href="{{ route('student.elections.index') }}" class="block p-2 text-sm rounded-lg hover:bg-slate-800 transition-colors {{ request()->routeIs('student.elections.*') ? 'bg-slate-800' : '' }}">Election Portal</a>
                     </div>
                 </div>
