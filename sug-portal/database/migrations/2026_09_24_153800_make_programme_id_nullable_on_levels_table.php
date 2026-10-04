@@ -8,15 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('levels', function (Blueprint $table) {
-            $table->foreignId('programme_id')->nullable()->change();
-        });
+        // Applied in the original levels table migration for fresh installs.
     }
 
     public function down(): void
     {
-        Schema::table('levels', function (Blueprint $table) {
-            $table->foreignId('programme_id')->nullable(false)->change();
-        });
+        // Nothing to reverse; this migration is retained for history only.
     }
 };

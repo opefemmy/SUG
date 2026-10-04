@@ -11,9 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('news', function (Blueprint $table) {
-            $table->dropColumn('image');
-        });
+        // Applied in the original news table migration for fresh installs.
     }
 
     /**
@@ -21,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('news', function (Blueprint $table) {
-            $table->string('image')->nullable();
-        });
+        // Nothing to reverse; this migration is retained for history only.
     }
 };

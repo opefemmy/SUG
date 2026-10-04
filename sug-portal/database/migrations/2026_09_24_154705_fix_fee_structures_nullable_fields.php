@@ -8,18 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('fee_structures', function (Blueprint $table) {
-            // Ensure these are nullable to allow general fees
-            $table->foreignId('programme_id')->nullable()->change();
-            $table->foreignId('level_id')->nullable()->change();
-        });
+        // Applied in the original fee structures migration for fresh installs.
     }
 
     public function down(): void
     {
-        Schema::table('fee_structures', function (Blueprint $table) {
-            $table->foreignId('programme_id')->nullable(false)->change();
-            $table->foreignId('level_id')->nullable(false)->change();
-        });
+        // Nothing to reverse; this migration is retained for history only.
     }
 };

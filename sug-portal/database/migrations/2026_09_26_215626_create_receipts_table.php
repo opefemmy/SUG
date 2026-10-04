@@ -11,13 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('receipts', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('payment_id')->constrained()->onDelete('cascade');
-            $table->string('receipt_number')->unique();
-            $table->timestamp('issued_at')->useCurrent();
-            $table->timestamps();
-        });
+        // The receipts table is created by the earlier
+        // 2026_09_24_113314 migration.
     }
 
     /**
@@ -25,6 +20,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('receipts');
+        // Nothing to reverse; this migration is retained for history only.
     }
 };
