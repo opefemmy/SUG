@@ -88,11 +88,32 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
+                            <label class="block text-sm font-medium text-gray-700">School</label>
+                            <select name="school_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                                <option value="">Select School</option>
+                                @foreach(\App\Models\School::orderBy('name')->get() as $school)
+                                    <option value="{{ $school->id }}" @selected(old('school_id') == $school->id)>{{ $school->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
                             <label class="block text-sm font-medium text-gray-700">Department</label>
                             <select name="department_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="">Select Dept</option>
                                 @foreach(\App\Models\Department::all() as $dept)
-                                    <option value="{{ $dept->id }}">{{ $dept->name }}</option>
+                                    <option value="{{ $dept->id }}" @selected(old('department_id') == $dept->id)>{{ $dept->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Programme</label>
+                            <select name="programme_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                                <option value="">Select Programme</option>
+                                @foreach(\App\Models\Programme::orderBy('name')->get() as $programme)
+                                    <option value="{{ $programme->id }}" @selected(old('programme_id') == $programme->id)>{{ $programme->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -100,10 +121,26 @@
                             <label class="block text-sm font-medium text-gray-700">Level</label>
                             <select name="level_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
                                 <option value="">Select Level</option>
-                                @foreach(\App\Models\Level::all() as $level)
-                                    <option value="{{ $level->id }}">{{ $level->name }}</option>
+                                @foreach(\App\Models\Level::orderBy('level_number')->get() as $level)
+                                    <option value="{{ $level->id }}" @selected(old('level_id') == $level->id)>Level {{ $level->level_number }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Academic Session</label>
+                            <select name="session_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                                <option value="">Select Session</option>
+                                @foreach(\App\Models\AcademicSession::orderByDesc('session_name')->get() as $session)
+                                    <option value="{{ $session->id }}" @selected(old('session_id') == $session->id)>{{ $session->session_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Admission Year</label>
+                            <input type="number" name="admission_year" value="{{ old('admission_year', date('Y')) }}" min="1900" max="{{ date('Y') }}" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
                         </div>
                     </div>
                 </div>

@@ -57,8 +57,12 @@ class AuthController extends Controller
 
         if ($request->role === 'student') {
             $rules['matric_no'] = ['required', 'string', 'unique:students,matric_no'];
+            $rules['school_id'] = ['required', 'exists:schools,id'];
             $rules['department_id'] = ['required', 'exists:departments,id'];
+            $rules['programme_id'] = ['required', 'exists:programmes,id'];
             $rules['level_id'] = ['required', 'exists:levels,id'];
+            $rules['session_id'] = ['required', 'exists:academic_sessions,id'];
+            $rules['admission_year'] = ['required', 'integer', 'between:1900,'.date('Y')];
         }
 
         $request->validate($rules);

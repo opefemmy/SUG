@@ -71,17 +71,28 @@ class AuthService
 
             // 3. Student Specific Records
             if ($data['role'] === 'student') {
+                $nameParts = preg_split('/\s+/', trim($data['name']));
                 $student = \App\Models\Student::create([
                     'user_id' => $user->id,
                     'matric_no' => $data['matric_no'],
+                    'school_id' => $data['school_id'],
                     'department_id' => $data['department_id'],
+                    'programme_id' => $data['programme_id'],
                     'current_level_id' => $data['level_id'],
+                    'session_id' => $data['session_id'],
+                    'admission_year' => $data['admission_year'],
                 ]);
 
                 \App\Models\StudentBiodata::create([
                     'student_id' => $student->id,
-                    'first_name' => explode(' ', $data['name'])[0] ?? 'Student',
-                    'last_name' => count(explode(' ', $data['name'])) > 1 ? end(explode(' ', $data['name'])) : 'Student',
+                    'first_name' => $nameParts[0] ?? 'Student',
+                    'last_name' => count($nameParts) > 1 ? end($nameParts) : 'Student',
+                    'email' => $data['email'],
+                    'phone_number' => '',
+                    'house_address' => '',
+                    'parent_name' => '',
+                    'parent_phone' => '',
+                    'parent_email' => '',
                     'is_completed' => false,
                 ]);
             }
