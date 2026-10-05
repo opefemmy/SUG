@@ -93,6 +93,8 @@ Route::get('/contact', function() {
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Student Dashboard
@@ -182,7 +184,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::middleware('permission:manage schools')->group(function () {
             Route::resource('schools', SchoolController::class);
             Route::get('schools/template', [SchoolController::class, 'downloadTemplate'])->name('schools.template');
-            Route::post('schools/import', [SchoolController::class, 'import'])->name('schools.import');
+            Route::post('schools/import', [SchoolController::class, 'import'])->name('schools.import.store');
         });
         Route::middleware('permission:manage departments')->group(function () {
             Route::resource('departments', DepartmentController::class);
@@ -275,7 +277,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/{id}/status', [SupportTicketController::class, 'updateStatus'])->name('update_status');
         });
     });
-});
+})->name('admin.');
 
 Route::get('/news', function() {
     return view('public.news', [

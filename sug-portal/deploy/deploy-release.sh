@@ -25,7 +25,7 @@ ln -s "$deploy_root/shared/.env" "$release/.env"
 ln -s "$deploy_root/shared/storage" "$release/storage"
 ln -sfn "$deploy_root/shared/storage/app/public" "$release/public/storage"
 
-chmod -R ug+rwX "$deploy_root/shared/storage" "$release/bootstrap/cache"
+chmod -R ug+rwX "$release/bootstrap/cache" || true
 
 cd "$release"
 "$php_bin" "${php_args[@]}" artisan migrate --force

@@ -125,6 +125,9 @@
                         </form>
                     @else
                         <a href="{{ route('login') }}" class="text-gray-600 hover:text-blue-700 text-sm font-medium">{{ $settings['nav_login'] ?? 'Log in' }}</a>
+                        @if (Route::has('register'))
+                            <a href="{{ route('register') }}" class="text-gray-600 hover:text-blue-700 text-sm font-medium ml-4">{{ $settings['nav_register'] ?? 'Register' }}</a>
+                        @endif
                     @endauth
                 </div>
             </div>

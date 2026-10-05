@@ -65,5 +65,8 @@ class PermissionSeeder extends Seeder
         // Note: We keep the 'admin' role for backward compatibility but we can give it all permissions
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $adminRole->syncPermissions(Permission::all());
+
+        // Students need a role for self-registration and login routing.
+        Role::firstOrCreate(['name' => 'student']);
     }
 }
