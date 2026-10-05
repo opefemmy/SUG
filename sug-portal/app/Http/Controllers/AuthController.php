@@ -48,13 +48,26 @@ class AuthController extends Controller
 
     public function register(Request $request): RedirectResponse
     {
-        $request->validate([
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+            'role' => ['required', 'string', 'in:student,admin'],
+        ];
 
-        $this->authService->register($request->all());
+        if ($request->role === 'student') {
+            $rules['matric_no'] = ['required', 'string', 'unique:students,matric_no'];
+            $rules['department_id'] = ['required', 'exists:departments,id'];
+            $rules['level_id'] = ['required', 'exists:levels,id'];
+        }
+
+        $request->validate($rules);
+
+        try {
+            $this->authService->register($request->all());
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Registration failed: ' . $e->getMessage()])->withInput();
+        }
 
         return redirect()->route('login')->with('success', 'Registration successful. Please login.');
     }
