@@ -1,0 +1,376 @@
+<title>SUG Portal Technical Blueprint</title>
+<style>
+:root {
+  /*
+  Layout: Industrial Blueprint.
+  A structured, high-contrast technical map using a grid-based layout
+  that evokes architectural drawings and system diagrams.
+  */
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --border: #cbd5e1;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --border: #334155;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --accent: #60a5fa;
+    --accent-soft: #1e3a8a;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --border: #334155;
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent: #60a5fa;
+  --accent-soft: #1e3a8a;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+header {
+  border-bottom: 3px solid var(--text-main);
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.meta-info {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 40px 0 20px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-title::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  background: var(--accent);
+  display: inline-block;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: 4px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.card-desc {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  margin-bottom: 16px;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-muted);
+}
+
+.logic-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+@media (max-width: 768px) {
+  .logic-grid {
+    grid-template-columns: 1fr;
+  }
+  h1 {
+    font-size: 1.8rem;
+  }
+}
+
+.blueprint-footer {
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono&family=Outfit:wght@700;800&display=swap">
+
+<div class="container">
+  <header>
+    <div>
+      <h1>SUG Portal</h1>
+      <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-muted);">Technical Blueprint v1.0</div>
+    </div>
+    <div class="meta-info">
+      STATUS: COMPILED<br>
+      SCOPE: DB + LOGIC<br>
+      DATE: 2026-10-06
+    </div>
+  </header>
+
+  <div class="section-title">Database Architecture</div>
+  <div class="grid">
+    <!-- Auth -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Identity & Access</div>
+        <div class="badge">Auth</div>
+      </div>
+      <div class="card-desc">Manages user authentication and Role-Based Access Control (RBAC).</div>
+      <div class="tag-list">
+        <span class="tag">users</span>
+        <span class="tag">permissions</span>
+        <span class="tag">role_permissions</span>
+        <span class="tag">user_roles</span>
+      </div>
+    </div>
+
+    <!-- Academic -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Academic Structure</div>
+        <div class="badge">Admin</div>
+      </div>
+      <div class="card-desc">The hierarchical organization of the institution.</div>
+      <div class="tag-list">
+        <span class="tag">schools</span>
+        <span class="tag">departments</span>
+        <span class="tag">programmes</span>
+        <span class="tag">levels</span>
+        <span class="tag">academic_sessions</span>
+        <span class="tag">students</span>
+        <span class="tag">student_biodata</span>
+      </div>
+    </div>
+
+    <!-- Financial -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Financial Engine</div>
+        <div class="badge">Money</div>
+      </div>
+      <div class="card-desc">Fee definitions, transaction processing, and receipting.</div>
+      <div class="tag-list">
+        <span class="tag">fee_types</span>
+        <span class="tag">fee_structures</span>
+        <span class="tag">payments</span>
+        <span class="tag">receipts</span>
+        <span class="tag">payment_complaints</span>
+      </div>
+    </div>
+
+    <!-- CMS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Content Management</div>
+        <div class="badge">CMS</div>
+      </div>
+      <div class="card-desc">Public-facing information and site configuration.</div>
+      <div class="tag-list">
+        <span class="tag">settings</span>
+        <span class="tag">pages</span>
+        <span class="tag">news</span>
+        <span class="tag">news_category</span>
+        <span class="tag">achievements</span>
+        <span class="tag">projects</span>
+        <span class="tag">galleries</span>
+        <span class="tag">events</span>
+        <span class="tag">downloads</span>
+      </div>
+    </div>
+
+    <!-- Student Services -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Student Services</div>
+        <div class="badge">Services</div>
+      </div>
+      <div class="card-desc">Direct utility services for the student body.</div>
+      <div class="tag-list">
+        <span class="tag">id_cards</span>
+        <span class="tag">id_card_settings</span>
+        <span class="tag">event_registrations</span>
+        <span class="tag">welfare_requests</span>
+        <span class="tag">support_tickets</span>
+        <span class="tag">support_messages</span>
+      </div>
+    </div>
+
+    <!-- Elections -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Election System</div>
+        <div class="badge">Governance</div>
+      </div>
+      <div class="card-desc">Secure voting, candidate management, and auditing.</div>
+      <div class="tag-list">
+        <span class="tag">elections</span>
+        <span class="tag">election_positions</span>
+        <span class="tag">candidates</span>
+        <span class="tag">voter_eligibilities</span>
+        <span class="tag">votes</span>
+        <span class="tag">election_audit_logs</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="logic-grid">
+    <div>
+      <div class="section-title">Business Logic (Services)</div>
+      <div class="grid" style="grid-template-columns: 1fr;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Core Service Modules</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.85rem;">
+            <div>
+              <strong>Academic:</strong> AcademicStructure, AcademicImport, StudentService
+            </div>
+            <div>
+              <strong>Financial:</strong> FeeService, PaymentService, ReceiptService
+            </div>
+            <div>
+              <strong>Student:</strong> IdCardService, EventService, WelfareService, SupportService
+            </div>
+            <div>
+              <strong>Elections:</strong> ElectionService, VotingService
+            </div>
+            <div>
+              <strong>System:</strong> ContentService, CommunicationService, AuditLogService
+            </div>
+            <div>
+              <strong>Governance:</strong> AdministrationService, AnalyticsService, SettingsService
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Controller Architecture</div>
+      <div class="grid" style="grid-template-columns: 1fr;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">User Interfaces</div>
+          </div>
+          <div style="font-size: 0.9rem;">
+            <p><strong>Admin:</strong> Full control over academic hierarchy, bulk imports, financial audits, election config, and support resolution.</p>
+            <p><strong>Student:</strong> Personal profile management, payment gateways, voting interface, welfare requests, and help desk.</p>
+            <p><strong>Public:</strong> Auth entry points, news consumption, and receipt verification.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="blueprint-footer">
+    END OF TECHNICAL MAP // GENERATED FOR LIVE SYNCHRONIZATION
+  </div>
+</div>
