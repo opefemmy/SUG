@@ -52,8 +52,8 @@
     <!-- CONTACT HEADER -->
     <header class="bg-white border-b py-16 px-4">
         <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 mb-4">Contact Us</h1>
-            <p class="text-gray-600 max-w-2xl mx-auto text-lg">We are here to help. Reach out to the SUG administration for any inquiries or support.</p>
+            <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 mb-4">{{ \App\Services\SettingsService::get('contact_header_title', 'Contact Us') }}</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto text-lg">{{ \App\Services\SettingsService::get('contact_header_subtitle', 'We are here to help. Reach out to the SUG administration for any inquiries or support.') }}</p>
         </div>
     </header>
 
@@ -71,7 +71,7 @@
                             </div>
                             <div>
                                 <p class="text-xs font-semibold text-gray-400 uppercase">Email</p>
-                                <p class="text-gray-700 font-medium">support@sug.edu.ng</p>
+                                <p class="text-gray-700 font-medium">{{ \App\Services\SettingsService::get('contact_email', 'support@sug.edu.ng') }}</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4">
@@ -80,7 +80,7 @@
                             </div>
                             <div>
                                 <p class="text-xs font-semibold text-gray-400 uppercase">Phone</p>
-                                <p class="text-gray-700 font-medium">+234 800 SUG PORTAL</p>
+                                <p class="text-gray-700 font-medium">{{ \App\Services\SettingsService::get('contact_phone', '+234 800 SUG PORTAL') }}</p>
                             </div>
                         </div>
                         <div class="flex items-start gap-4">
@@ -89,7 +89,7 @@
                             </div>
                             <div>
                                 <p class="text-xs font-semibold text-gray-400 uppercase">Address</p>
-                                <p class="text-gray-700 font-medium">SUG Secretariat, University Campus</p>
+                                <p class="text-gray-700 font-medium">{{ \App\Services\SettingsService::get('contact_address', 'SUG Secretariat, University Campus') }}</p>
                             </div>
                         </div>
                     </div>

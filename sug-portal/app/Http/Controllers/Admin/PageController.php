@@ -3,63 +3,35 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Page;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class PageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): View
     {
-        //
+        $pages = Page::all();
+        return view('admin.pages.index', compact('pages'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function edit($slug): View
     {
-        //
+        $page = Page::where('slug', $slug)->firstOrFail();
+        return view('admin.pages.edit', compact('page'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function update(Request $request, $slug): RedirectResponse
     {
-        //
-    }
+        $request->validate([
+            'title' => 'nullable|string|max:255',
+            'content' => 'required|string',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        $page = Page::where('slug', $slug)->firstOrFail();
+        $page->update($request->only(['title', 'content']));
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('admin.pages.index')->with('success', 'Page updated successfully.');
     }
 }

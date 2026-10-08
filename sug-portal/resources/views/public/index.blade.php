@@ -206,8 +206,8 @@
     <section class="py-20 bg-white px-4">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose Our Portal?</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Experience the most transparent and efficient way to manage your student union affairs.</p>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">{{ \App\Services\SettingsService::get('home_why_choose_title', 'Why Choose Our Portal?') }}</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">{{ \App\Services\SettingsService::get('home_why_choose_desc', 'Experience the most transparent and efficient way to manage your student union affairs.') }}</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Flip Box 1 -->
@@ -240,7 +240,7 @@
                         <div class="flip-box-back">
                             <h3 class="text-xl font-bold mb-4">Absolute Privacy</h3>
                             <p class="text-green-100 text-sm mb-6">End-to-end encrypted voting ensures your choice remains anonymous.</p>
-                            <a href="{{ route('login') }}" class="bg-white text-green-700 px-4 py-2 rounded-full text-xs font-bold hover:bg-green-50 transition">Vote Now</a>
+                            <a href="{{ route('student.elections.index') }}" class="bg-white text-green-700 px-4 py-2 rounded-full text-xs font-bold hover:bg-green-50 transition">Vote Now</a>
                         </div>
                     </div>
                 </div>
@@ -268,8 +268,8 @@
     <!-- FEATURE GRID -->
     <section class="py-20 px-4 max-w-7xl mx-auto">
         <div class="text-center mb-16">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">{{ $settings['services_title'] ?? 'Our Student Services' }}</h2>
-            <p class="text-gray-600 max-w-2xl mx-auto">{{ $settings['services_subtitle'] ?? 'Everything you need to navigate your university life seamlessly in one place.' }}</p>
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">{{ \App\Services\SettingsService::get('home_services_title', 'Our Student Services') }}</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">{{ \App\Services\SettingsService::get('home_services_subtitle', 'Everything you need to navigate your university life seamlessly in one place.') }}</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Fee Payment -->

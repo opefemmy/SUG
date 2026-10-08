@@ -58,6 +58,10 @@
                         </td>
                         <td class="px-6 py-4 text-right space-x-2">
                             <a href="{{ route('admin.users.edit', $user->id) }}" class="text-blue-600 hover:text-blue-800 font-medium text-sm">Edit</a>
+                            <form action="{{ route('admin.users.reset_password', $user->id) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="text-green-600 hover:text-green-800 font-medium text-sm" onclick="return confirm('Reset password to Student1?')">Reset Password</button>
+                            </form>
                             <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')

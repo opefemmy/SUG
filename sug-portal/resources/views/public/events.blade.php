@@ -60,23 +60,33 @@
     <!-- EVENTS LISTING -->
     <main class="py-12 px-4 max-w-7xl mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Placeholder Event 1 -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group">
-                <div class="h-48 bg-blue-600 flex items-center justify-center text-white relative">
-                    <i class="fas fa-calendar-alt text-5xl opacity-20"></i>
-                    <div class="absolute top-4 right-4 bg-white text-blue-600 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
-                        Coming Soon
+            @forelse(\App\Models\Event::orderBy('event_date', 'asc')->get() as $event)
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group">
+                    <div class="h-48 bg-blue-600 flex items-center justify-center text-white relative">
+                        @if($event->image_path)
+                            <img src="{{ asset('storage/' . $event->image_path) }}" class="w-full h-full object-cover">
+                        @else
+                            <i class="fas fa-calendar-alt text-5xl opacity-20"></i>
+                        @endif
+                        <div class="absolute top-4 right-4 bg-white text-blue-600 px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+                            Upcoming
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition">{{ $event->title }}</h3>
+                        <p class="text-gray-600 text-sm mb-4">{{ Str::limit($event->description, 100) }}</p>
+                        <div class="flex items-center gap-4 text-xs text-gray-400 font-medium">
+                            <span><i class="far fa-calendar mr-1"></i> {{ $event->event_date->format('M d, Y') }}</span>
+                            <span><i class="fas fa-map-marker-alt mr-1"></i> {{ $event->location }}</span>
+                        </div>
                     </div>
                 </div>
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-700 transition">General Assembly</h3>
-                    <p class="text-gray-600 text-sm mb-4">Discussing the welfare of students and upcoming semester plans.</p>
-                    <div class="flex items-center gap-4 text-xs text-gray-400 font-medium">
-                        <span><i class="far fa-calendar mr-1"></i> TBD</span>
-                        <span><i class="fas fa-map-marker-alt mr-1"></i> Main Auditorium</span>
-                    </div>
+            @empty
+                <div class="col-span-full text-center py-20">
+                    <i class="fas fa-calendar-times text-gray-300 text-6xl mb-4"></i>
+                    <p class="text-gray-500 text-lg italic">No upcoming events at the moment.</p>
                 </div>
-            </div>
+            @endforelse
         </div>
     </main>
 

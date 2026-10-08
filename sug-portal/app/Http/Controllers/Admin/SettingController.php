@@ -22,7 +22,7 @@ class SettingController extends Controller
 
     public function index(): View
     {
-        $groups = ['general', 'branding', 'sug'];
+        $groups = ['general', 'branding', 'sug', 'home', 'about', 'contact', 'news'];
         $settingsData = [];
 
         foreach ($groups as $group) {
@@ -105,6 +105,10 @@ class SettingController extends Controller
     {
         if (str_starts_with($key, 'brand_')) return 'branding';
         if (str_starts_with($key, 'sug_')) return 'sug';
+        if (str_starts_with($key, 'home_')) return 'home';
+        if (str_starts_with($key, 'about_')) return 'about';
+        if (str_starts_with($key, 'contact_')) return 'contact';
+        if (str_starts_with($key, 'news_')) return 'news';
         return 'general';
     }
 }

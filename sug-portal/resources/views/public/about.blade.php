@@ -52,48 +52,15 @@
     <!-- ABOUT HEADER -->
     <header class="bg-white border-b py-16 px-4">
         <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 mb-4">About the SUG</h1>
-            <p class="text-gray-600 max-w-2xl mx-auto text-lg">Serving students with integrity, transparency, and dedication to academic excellence.</p>
+            <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 mb-4">{{ \App\Services\SettingsService::get('about_header_title', 'About the SUG') }}</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto text-lg">{{ \App\Services\SettingsService::get('about_header_subtitle', 'Serving students with integrity, transparency, and dedication to academic excellence.') }}</p>
         </div>
     </header>
 
     <!-- ABOUT CONTENT -->
     <main class="py-12 px-4 max-w-5xl mx-auto">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 md:p-12">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Our Mission</h2>
-                    <p class="text-gray-600 leading-relaxed mb-6">
-                        The Student Union Government (SUG) is the primary representative body for all students. Our mission is to advocate for student rights, facilitate communication between the student body and university management, and enhance the overall campus experience.
-                    </p>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Our Vision</h2>
-                    <p class="text-gray-600 leading-relaxed">
-                        To create a vibrant, inclusive, and digitally empowered student community where every voice is heard and every student has the resources they need to succeed.
-                    </p>
-                </div>
-                <div class="bg-blue-50 rounded-2xl p-8 border border-blue-100">
-                    <h3 class="text-xl font-bold text-blue-900 mb-4">Core Values</h3>
-                    <ul class="space-y-4">
-                        <li class="flex items-center gap-3 text-blue-800">
-                            <i class="fas fa-check-circle"></i> <span>Transparency in Governance</span>
-                        </li>
-                        <li class="flex items-center gap-3 text-blue-800">
-                            <i class="fas fa-check-circle"></i> <span>Accountability to Students</span>
-                        </li>
-                        <li class="flex items-center gap-3 text-blue-800">
-                            <i class="fas fa-check-circle"></i> <span>Inclusive Representation</span>
-                        </li>
-                        <li class="flex items-center gap-3 text-blue-800">
-                            <i class="fas fa-check-circle"></i> <span>Academic Excellence</span>
-                        </li>
-                    </ul>
-                    <div class="mt-8">
-                        <a href="{{ route('executives.index') }}" class="block text-center bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">
-                            Meet Our Executives <i class="fas fa-arrow-right ml-2"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+            {!! \App\Models\Page::where('slug', 'about')->value('content') ?? 'About content coming soon...' !!}
         </div>
     </main>
 

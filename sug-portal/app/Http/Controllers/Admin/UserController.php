@@ -45,7 +45,8 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'status' => 'required|in:active,inactive',
-            'role' => 'required|exists:roles,name',
+            'roles' => 'required|array|min:1',
+            'roles.*' => 'exists:roles,name',
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,name',
         ]);
@@ -57,13 +58,13 @@ class UserController extends Controller
             'status' => $validated['status'],
         ]);
 
-        $this->rolePermissionService->assignRoleToUser($user, $validated['role']);
+        $this->rolePermissionService->syncRolesForUser($user, $validated['roles']);
 
         if ($request->has('permissions')) {
             $user->syncPermissions($request->permissions);
         }
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
     public function edit(User $user): View
@@ -78,7 +79,8 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
             'status' => 'required|in:active,inactive',
-            'role' => 'required|exists:roles,name',
+            'roles' => 'required|array|min:1',
+            'roles.*' => 'exists:roles,name',
             'permissions' => 'nullable|array',
             'permissions.*' => 'exists:permissions,name',
         ]);
@@ -93,7 +95,7 @@ class UserController extends Controller
             $user->update(['password' => \Illuminate\Support\Facades\Hash::make($validated['password'])]);
         }
 
-        $this->rolePermissionService->syncRolesForUser($user, [$validated['role']]);
+        $this->rolePermissionService->syncRolesForUser($user, $validated['roles']);
 
         if ($request->has('permissions')) {
             $user->syncPermissions($request->permissions);
@@ -101,12 +103,21 @@ class UserController extends Controller
             $user->syncPermissions([]);
         }
 
-        return redirect()->route('users.index')->with('success', 'User updated successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user): RedirectResponse
     {
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+    }
+
+    public function resetPassword(User $user): RedirectResponse
+    {
+        $user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make('Student1')
+        ]);
+
+        return redirect()->route('admin.users.index')->with('success', "Password for {$user->name} has been reset to Student1.");
     }
 }

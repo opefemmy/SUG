@@ -43,6 +43,7 @@ class PaymentComplaintController extends Controller
     {
         $request->validate([
             'category' => 'required|string',
+            'subject' => 'nullable|string|max:1000',
             'fee_structure_id' => 'required|exists:fee_structures,id',
             'transaction_ref' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
@@ -54,6 +55,7 @@ class PaymentComplaintController extends Controller
         PaymentComplaint::create([
             'student_id' => $student->id,
             'category' => $request->category,
+            'subject' => $request->subject,
             'fee_structure_id' => $request->fee_structure_id,
             'transaction_ref' => $request->transaction_ref,
             'amount' => $request->amount,

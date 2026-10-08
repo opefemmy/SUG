@@ -93,8 +93,6 @@ Route::get('/contact', function() {
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Student Dashboard
@@ -120,6 +118,7 @@ Route::prefix('student')->name('student.')->group(function () {
     Route::post('/fees/process', [StudentFeeController::class, 'processPayment'])->name('fees.process');
     Route::get('/fees/requery/{reference}', [StudentFeeController::class, 'requery'])->name('fees.requery');
     Route::post('/fees/verify-manual', [StudentFeeController::class, 'verifyManual'])->name('fees.verifyManual');
+    Route::post('/fees/callback', [StudentFeeController::class, 'callback'])->name('payment.callback');
 
     // Elections
     Route::get('/elections', [StudentVotingController::class, 'index'])->name('elections.index');
@@ -167,6 +166,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::middleware('permission:manage users')->group(function () {
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+        Route::post('users/{user}/reset-password', [\App\Http\Controllers\Admin\UserController::class, 'resetPassword'])->name('users.reset_password');
     });
 
     Route::middleware('permission:manage schools')->group(function () {
@@ -218,9 +218,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
     Route::middleware('permission:edit fees')->group(function () {
         Route::get('fees/create', [\App\Http\Controllers\Admin\FeeController::class, 'create'])->name('fees.create');
+        Route::post('fees', [\App\Http\Controllers\Admin\FeeController::class, 'store'])->name('fees.store');
         Route::get('fees/{fee}/edit', [\App\Http\Controllers\Admin\FeeController::class, 'edit'])->name('fees.edit');
         Route::put('fees/{fee}', [\App\Http\Controllers\Admin\FeeController::class, 'update'])->name('fees.update');
         Route::delete('fees/{fee}', [\App\Http\Controllers\Admin\FeeController::class, 'destroy'])->name('fees.destroy');
+        Route::resource('fee-types', \App\Http\Controllers\Admin\FeeTypeController::class);
     });
     Route::middleware('permission:view payments')->group(function () {
         Route::get('debtors', [\App\Http\Controllers\Admin\DebtorController::class, 'index'])->name('debtors.index');
@@ -233,10 +235,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('permission:view payments')->group(function () {
         Route::get('payments-history', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'index'])->name('payments.history');
         Route::get('payments-history/export', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'export'])->name('payments.history.export');
+        Route::post('payments-history/{id}/confirm', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'confirmPayment'])->name('payments.history.confirm');
         Route::post('payments-history/{id}/mark-unpaid', [\App\Http\Controllers\Admin\PaymentHistoryController::class, 'markAsUnpaid'])->name('payments.history.mark_unpaid');
     });
 
     Route::middleware('permission:manage news')->group(function () {
+        Route::resource('pages', \App\Http\Controllers\Admin\PageController::class)->only(['index', 'edit', 'update']);
+        Route::resource('events', \App\Http\Controllers\Admin\EventController::class);
         Route::resource('elections', ElectionController::class);
         Route::post('elections/toggle-voting', [ \App\Http\Controllers\Admin\ElectionSettingsController::class, 'toggleVoting'])->name('elections.toggle_voting');
         Route::resource('candidates', CandidateController::class);
@@ -249,9 +254,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     Route::middleware('permission:view students')->group(function () {
-        Route::resource('students', \App\Http\Controllers\Admin\StudentController::class);
         Route::get('students/import', [\App\Http\Controllers\Admin\StudentImportController::class, 'index'])->name('students.import.index');
         Route::post('students/import', [\App\Http\Controllers\Admin\StudentImportController::class, 'import'])->name('students.import.store');
+        Route::resource('students', \App\Http\Controllers\Admin\StudentController::class);
     });
 
     Route::prefix('promotion')->name('promotion.')->group(function () {

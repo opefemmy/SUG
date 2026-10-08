@@ -42,6 +42,7 @@ class ProgrammeController extends Controller
         $validated = $request->validate([
             'department_id' => 'required|exists:departments,id',
             'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:programmes,code',
             'duration_years' => 'required|integer|min:1',
         ]);
 
@@ -62,6 +63,7 @@ class ProgrammeController extends Controller
         $validated = $request->validate([
             'department_id' => 'required|exists:departments,id',
             'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:programmes,code,' . $programme->id,
             'duration_years' => 'required|integer|min:1',
         ]);
 

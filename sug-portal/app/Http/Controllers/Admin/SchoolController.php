@@ -32,6 +32,7 @@ class SchoolController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:schools,name',
+            'code' => 'required|string|max:50|unique:schools,code',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -51,6 +52,7 @@ class SchoolController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:schools,name,' . $school->id,
+            'code' => 'required|string|max:50|unique:schools,code,' . $school->id,
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);

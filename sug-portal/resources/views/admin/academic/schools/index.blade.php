@@ -8,7 +8,7 @@
             <a href="{{ route('admin.academic.schools.template') }}" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-xs font-bold border border-gray-300 flex items-center gap-1">
                 <i class="fas fa-download"></i> Download Template
             </a>
-            <form action="{{ route('admin.academic.schools.import') }}" method="POST" enctype="multipart/form-data" class="flex gap-2">
+            <form action="{{ route('admin.academic.schools.import.store') }}" method="POST" enctype="multipart/form-data" class="flex gap-2">
                 @csrf
                 <input type="file" name="csv_file" class="text-xs p-1 border rounded-lg bg-white outline-none">
                 <button type="submit" class="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-xs font-bold border border-gray-300">

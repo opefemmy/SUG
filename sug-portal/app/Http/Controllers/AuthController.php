@@ -24,12 +24,12 @@ class AuthController extends Controller
     public function login(Request $request): RedirectResponse
     {
         $request->validate([
-            'email' => ['required', 'string'],
+            'login' => ['required', 'string'],
             'password' => ['required'],
         ]);
 
         try {
-            $user = $this->authService->login($request->only('email', 'password'));
+            $user = $this->authService->login($request->only('login', 'password'));
         } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput();
         }

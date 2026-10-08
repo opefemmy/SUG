@@ -52,8 +52,8 @@
     <!-- NEWS HEADER -->
     <header class="bg-white border-b py-12 px-4">
         <div class="max-w-7xl mx-auto text-center">
-            <h1 class="text-4xl font-extrabold text-gray-900 mb-4">{{ $settings['nav_news'] ?? 'Campus News & Updates' }}</h1>
-            <p class="text-gray-600 max-w-2xl mx-auto">Stay informed about the latest announcements, SUG activities, and university news.</p>
+            <h1 class="text-4xl font-extrabold text-gray-900 mb-4">{{ \App\Services\SettingsService::get('news_header_title', 'Campus News & Updates') }}</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">{{ \App\Services\SettingsService::get('news_header_subtitle', 'Stay informed about the latest announcements, SUG activities, and university news.') }}</p>
         </div>
     </header>
 

@@ -61,7 +61,7 @@ class PaymentService
             'name' => $student->user->name,
             'amount' => $fee->amount,
             'reference' => $reference,
-            'callback_url' => route('payment.callback'),
+            'callback_url' => route('student.payment.callback'),
             'fee_name' => $fee->feeType->name,
             'metadata' => [
                 'payment_id' => $payment->id,

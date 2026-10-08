@@ -102,6 +102,38 @@ class PaymentHistoryController extends Controller
     }
 
     /**
+     * Mark a payment as successful (Manual Confirmation).
+     */
+    public function confirmPayment($id)
+    {
+        try {
+            $payment = Payment::findOrFail($id);
+
+            if ($payment->status === 'success') {
+                return redirect()->back()->with('info', 'Payment is already marked as successful.');
+            }
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($payment) {
+                // Update payment status
+                $payment->update(['status' => 'success']);
+
+                // Create receipt if it doesn't exist
+                \App\Models\Receipt::firstOrCreate(
+                    ['payment_id' => $payment->id],
+                    [
+                        'receipt_no' => 'MANUAL-' . strtoupper(uniqid()),
+                        'issued_at' => now(),
+                    ]
+                );
+            });
+
+            return redirect()->back()->with('success', 'Payment confirmed successfully. Receipt has been issued.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to confirm payment: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Mark a manual payment as unpaid (delete the payment and associated receipt).
      */
     public function markAsUnpaid($id)

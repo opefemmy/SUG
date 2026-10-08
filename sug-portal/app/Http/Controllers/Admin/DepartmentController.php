@@ -35,6 +35,7 @@ class DepartmentController extends Controller
         $validated = $request->validate([
             'school_id' => 'required|exists:schools,id',
             'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:departments,code',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -56,6 +57,7 @@ class DepartmentController extends Controller
         $validated = $request->validate([
             'school_id' => 'required|exists:schools,id',
             'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:departments,code,' . $department->id,
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);

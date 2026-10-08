@@ -88,21 +88,32 @@
                         </td>
                         <td class="p-4 text-sm text-gray-500">{{ $payment->created_at->format('M d, Y H:i') }}</td>
                         <td class="p-4 text-center">
-                            @if(str_contains($payment->receipt->receipt_no ?? '', 'MANUAL'))
-                                <form action="{{ route('admin.payments.history.mark_unpaid', $payment->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove this manual payment? This will mark the student as unpaid.');">
+                            <div class="flex flex-col gap-2 items-center">
+                                <form action="{{ route('admin.payments.history.confirm', $payment->id) }}" method="POST" onsubmit="return confirm('Confirm this payment as successful? This will update the status and refresh the manual receipt.');">
                                     @csrf
-                                    @method('POST')
-                                    <button type="submit" class="bg-red-100 text-red-600 px-3 py-1 rounded text-xs font-bold hover:bg-red-200 transition border border-red-200">
-                                        Mark Unpaid
+                                    <button type="submit" class="bg-green-100 text-green-600 px-3 py-1 rounded text-xs font-bold hover:bg-green-200 transition border border-green-200">
+                                        Confirm Payment
                                     </button>
                                 </form>
-                            @else
+
+                                @if(str_contains($payment->receipt->receipt_no ?? '', 'MANUAL'))
+                                    <form action="{{ route('admin.payments.history.mark_unpaid', $payment->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove this manual payment? This will mark the student as unpaid.');">
+                                        @csrf
+                                        @method('POST')
+                                        <button type="submit" class="bg-red-100 text-red-600 px-3 py-1 rounded text-xs font-bold hover:bg-red-200 transition border border-red-200">
+                                            Mark Unpaid
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                            @if($payment->status === 'success' && !str_contains($payment->receipt->receipt_no ?? '', 'MANUAL'))
                                 <span class="text-gray-400 text-xs italic">Portal Payment</span>
+                            @elseif($payment->status === 'success')
+                                <span class="text-green-600 text-xs italic">Confirmed</span>
                             @endif
                         </td>
                     </tr>
                 @empty
-
                     <tr>
                         <td colspan="8" class="p-8 text-center text-gray-500">No payments found.</td>
                     </tr>

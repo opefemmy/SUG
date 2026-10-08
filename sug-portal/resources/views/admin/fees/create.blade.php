@@ -13,12 +13,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Fee Type</label>
-                    <select name="fee_type_id" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required>
-                        <option value="">Select Fee Type</option>
-                        @foreach($feeTypes as $type)
-                            <option value="{{ $type->id }}">{{ $type->name }}</option>
-                        @endforeach
-                    </select>
+                    <input type="text" name="fee_type_name" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. Tuition Fee, Development Levy" required>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Amount (₦)</label>

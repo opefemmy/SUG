@@ -31,7 +31,7 @@ class FeeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'fee_type_id' => 'required|exists:fee_types,id',
+            'fee_type_name' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
             'level_id' => 'required|exists:levels,id',
             'programme_id' => 'nullable|exists:programmes,id',
@@ -39,9 +39,14 @@ class FeeController extends Controller
             'is_mandatory' => 'boolean',
         ]);
 
-        // IMPORTANT: Laravel's $request->validate() can return empty strings for nullable fields.
-        // SQLite/MySQL Foreign Keys will fail if we try to insert an empty string "" into a foreign key column.
+        // Resolve or create the FeeType on the fly
+        $feeType = FeeType::firstOrCreate(
+            ['name' => $validated['fee_type_name']],
+            ['description' => 'Automatically created from fee structure configuration']
+        );
+
         $data = $request->all();
+        $data['fee_type_id'] = $feeType->id;
         $data['programme_id'] = $request->filled('programme_id') ? $request->programme_id : null;
         $data['is_mandatory'] = $request->has('is_mandatory');
 

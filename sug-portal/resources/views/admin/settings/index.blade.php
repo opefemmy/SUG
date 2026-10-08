@@ -9,7 +9,7 @@
     <form action="{{ route('settings.update') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="space-y-8">
-            @foreach(['general' => 'General Settings', 'branding' => 'Branding & Appearance', 'sug' => 'SUG Configuration'] as $groupKey => $groupLabel)
+            @foreach(['general' => 'General Settings', 'branding' => 'Branding & Appearance', 'sug' => 'SUG Configuration', 'home' => 'Home Page Content', 'about' => 'About Page Content', 'contact' => 'Contact Details', 'news' => 'News Page Content'] as $groupKey => $groupLabel)
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
                         <h2 class="text-lg font-semibold text-gray-700">{{ $groupLabel }}</h2>
@@ -33,6 +33,27 @@
                                 'sug' => [
                                     'sug_motto' => ['label' => 'SUG Motto', 'placeholder' => 'Service and Integrity'],
                                     'sug_vision' => ['label' => 'SUG Vision', 'placeholder' => 'To be the leading student union...']
+                                ],
+                                'home' => [
+                                    'home_why_choose_title' => ['label' => 'Why Choose Us Title', 'placeholder' => 'Why Choose Our Portal?'],
+                                    'home_why_choose_desc' => ['label' => 'Why Choose Us Description', 'placeholder' => 'Experience the most transparent...'],
+                                    'home_services_title' => ['label' => 'Our Services Title', 'placeholder' => 'Our Student Services'],
+                                    'home_services_subtitle' => ['label' => 'Our Services Subtitle', 'placeholder' => 'Everything you need...'],
+                                ],
+                                'about' => [
+                                    'about_header_title' => ['label' => 'About Header Title', 'placeholder' => 'About the SUG'],
+                                    'about_header_subtitle' => ['label' => 'About Header Subtitle', 'placeholder' => 'Serving students with integrity...'],
+                                ],
+                                'contact' => [
+                                    'contact_header_title' => ['label' => 'Contact Header Title', 'placeholder' => 'Contact Us'],
+                                    'contact_header_subtitle' => ['label' => 'Contact Header Subtitle', 'placeholder' => 'We are here to help...'],
+                                    'contact_email' => ['label' => 'Contact Email', 'placeholder' => 'support@sug.edu.ng'],
+                                    'contact_phone' => ['label' => 'Contact Phone', 'placeholder' => '+234 800 SUG PORTAL'],
+                                    'contact_address' => ['label' => 'Contact Address', 'placeholder' => 'SUG Secretariat, University Campus'],
+                                ],
+                                'news' => [
+                                    'news_header_title' => ['label' => 'News Header Title', 'placeholder' => 'Campus News & Updates'],
+                                    'news_header_subtitle' => ['label' => 'News Header Subtitle', 'placeholder' => 'Stay informed about the latest...'],
                                 ],
                             ];
 

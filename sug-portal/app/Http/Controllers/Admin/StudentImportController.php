@@ -20,7 +20,7 @@ class StudentImportController extends Controller
         return view('admin.students.import');
     }
 
-    public function store(Request $request)
+    public function import(Request $request)
     {
         $request->validate([
             'csv_file' => 'required|file|mimes:csv,txt',

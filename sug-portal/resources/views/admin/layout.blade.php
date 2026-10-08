@@ -175,15 +175,15 @@
             </nav>
 
             <div class="p-4 border-t border-slate-800">
-                <form action="{{ route('logout') }}" method="POST">
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
                     @csrf
-                    <button type="submit" class="flex items-center w-full p-2 rounded-lg hover:bg-red-900 transition-colors text-red-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6-4v12" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3">Logout</span>
-                    </button>
                 </form>
+                <button type="button" onclick="if(confirm('Are you sure you want to logout?')) { document.getElementById('logout-form').submit(); }" class="flex items-center w-full p-2 rounded-lg hover:bg-red-900 transition-colors text-red-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6-4v12" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3">Logout</span>
+                </button>
             </div>
         </aside>
 

@@ -14,17 +14,35 @@ class AuthService
      */
     public function login(array $credentials): User
     {
-        $email = $credentials['email'];
+        $login = $credentials['login'];
         $password = $credentials['password'];
 
-        // 1. Try standard authentication
-        if (Auth::attempt($credentials)) {
-            return $this->validateUserStatus(Auth::user());
+        // 1. Identify the user by email or matric number
+        $user = User::where('email', $login)->first();
+
+        if (!$user) {
+            $student = \App\Models\Student::where('matric_no', $login)->first();
+            if ($student) {
+                $user = User::find($student->user_id);
+            }
         }
 
-        // 2. Fallback for first-time login: check if provided password matches the user's last_name (case-insensitive)
-        $user = User::where('email', $email)->first();
-        if ($user && $user->hasRole('student')) {
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'login' => [__('auth.failed')],
+            ]);
+        }
+
+        // 2. Try standard password authentication
+        if (Hash::check($password, $user->password)) {
+            if ($this->validateUserStatus($user)) {
+                Auth::login($user);
+                return $user;
+            }
+        }
+
+        // 3. Fallback for students: check if provided password matches the user's last_name (case-insensitive)
+        if ($user->hasRole('student')) {
             $student = \App\Models\Student::where('user_id', $user->id)->first();
             $biodata = \App\Models\StudentBiodata::where('student_id', $student?->id)->first();
 
@@ -37,7 +55,7 @@ class AuthService
         }
 
         throw ValidationException::withMessages([
-            'email' => [__('auth.failed')],
+            'login' => [__('auth.failed')],
         ]);
     }
 
@@ -46,10 +64,10 @@ class AuthService
         if ($user->status !== 'active') {
             Auth::logout();
             throw ValidationException::withMessages([
-                'email' => ['Your account is inactive. Please contact the administrator.'],
+                'login' => ['Your account is inactive. Please contact the administrator.'],
             ]);
         }
-        return $user;
+        return true;
     }
 
     /**
