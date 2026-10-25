@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -11,16 +12,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            if (! Schema::hasColumn('events', 'location')) {
+        $columns = $this->eventColumns();
+
+        Schema::table('events', function (Blueprint $table) use ($columns) {
+            if (! in_array('location', $columns, true)) {
                 $table->string('location')->nullable();
             }
 
-            if (! Schema::hasColumn('events', 'image_path')) {
+            if (! in_array('image_path', $columns, true)) {
                 $table->string('image_path')->nullable();
             }
 
-            if (! Schema::hasColumn('events', 'sort_order')) {
+            if (! in_array('sort_order', $columns, true)) {
                 $table->integer('sort_order')->default(0);
             }
         });
@@ -31,15 +34,29 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('events', function (Blueprint $table) {
+        $existing = $this->eventColumns();
+
+        Schema::table('events', function (Blueprint $table) use ($existing) {
             $columns = array_filter(
                 ['location', 'image_path', 'sort_order'],
-                fn (string $column) => Schema::hasColumn('events', $column)
+                fn (string $column) => in_array($column, $existing, true)
             );
 
             if ($columns !== []) {
                 $table->dropColumn($columns);
             }
         });
+    }
+
+    private function eventColumns(): array
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            return array_map(
+                fn (object $column) => $column->name,
+                DB::select("PRAGMA table_info('events')")
+            );
+        }
+
+        return Schema::getColumnListing('events');
     }
 };
