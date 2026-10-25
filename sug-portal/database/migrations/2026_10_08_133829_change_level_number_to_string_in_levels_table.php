@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -11,9 +10,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('levels', function (Blueprint $table) {
-            $table->string('level_number')->change();
-        });
+        // Fresh databases already use a string column in the original migration.
+        // Existing production databases still need the legacy integer converted.
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE levels MODIFY level_number VARCHAR(255) NOT NULL');
+        }
     }
 
     /**
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('levels', function (Blueprint $table) {
-            $table->integer('level_number')->change();
-        });
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('ALTER TABLE levels MODIFY level_number INT NOT NULL');
+        }
     }
 };

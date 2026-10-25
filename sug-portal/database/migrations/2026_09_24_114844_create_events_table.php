@@ -13,9 +13,9 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->dateTime('event_date');
-            $table->string('venue');
-            $table->string('image')->nullable();
-            $table->boolean('is_published')->default(true);
+            $table->string('location');
+            $table->string('image_path')->nullable();
+            $table->integer('sort_order')->default(0);
             $table->timestamps();
         });
     }

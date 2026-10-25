@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('events', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->text('description');
-            $table->dateTime('event_date');
-            $table->string('location');
-            $table->string('image_path')->nullable();
-            $table->integer('sort_order')->default(0);
-            $table->timestamps();
+        Schema::table('events', function (Blueprint $table) {
+            if (! Schema::hasColumn('events', 'location')) {
+                $table->string('location')->nullable();
+            }
+
+            if (! Schema::hasColumn('events', 'image_path')) {
+                $table->string('image_path')->nullable();
+            }
+
+            if (! Schema::hasColumn('events', 'sort_order')) {
+                $table->integer('sort_order')->default(0);
+            }
         });
     }
 
@@ -28,6 +31,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('events');
+        Schema::table('events', function (Blueprint $table) {
+            $columns = array_filter(
+                ['location', 'image_path', 'sort_order'],
+                fn (string $column) => Schema::hasColumn('events', $column)
+            );
+
+            if ($columns !== []) {
+                $table->dropColumn($columns);
+            }
+        });
     }
 };

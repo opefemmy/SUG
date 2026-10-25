@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payment_complaints', function (Blueprint $table) {
-            $table->string('category')->after('student_id')->nullable();
-            $table->text('subject')->after('category')->nullable();
+            if (! Schema::hasColumn('payment_complaints', 'category')) {
+                $table->string('category')->after('student_id')->nullable();
+            }
+
+            if (! Schema::hasColumn('payment_complaints', 'subject')) {
+                $table->text('subject')->after('category')->nullable();
+            }
         });
     }
 
@@ -23,7 +28,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('payment_complaints', function (Blueprint $table) {
-            $table->dropColumn(['category', 'subject']);
+            if (Schema::hasColumn('payment_complaints', 'subject')) {
+                $table->dropColumn('subject');
+            }
         });
     }
 };

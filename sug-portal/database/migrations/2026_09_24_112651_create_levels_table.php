@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('levels', function (Blueprint $table) {
             $table->id();
             $table->foreignId('programme_id')->nullable()->constrained()->onDelete('cascade');
-            $table->integer('level_number');
+            $table->string('level_number');
             $table->timestamps();
         });
     }
